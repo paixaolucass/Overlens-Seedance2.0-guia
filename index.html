@@ -1,0 +1,2498 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Overlens · Guia de Prompts e Workflows Seedance 2.0</title>
+  <meta name="description" content="Prompts e workflows que realmente funcionam para multi-shot e @Reference no Seedance 2.0. Da teoria à prática." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Outfit:wght@100..900&display=swap" rel="stylesheet" />
+  <style>
+    /* ─────────────────────────────────────────────
+       OVERLENS DESIGN TOKENS
+       ───────────────────────────────────────────── */
+    :root {
+      --neutral-black: #000000;
+      --neutral-950:   #101010;
+      --neutral-900:   #202020;
+      --neutral-800:   #303030;
+      --neutral-700:   #404040;
+      --neutral-600:   #5C5C5C;
+      --neutral-500:   #A4A4A4;
+      --neutral-400:   #BCBCBC;
+      --neutral-300:   #D4D4D4;
+      --neutral-200:   #E7E7E7;
+      --neutral-100:   #F2F2F2;
+      --neutral-white: #FFFFFF;
+
+      --brand-atmos:  #77C5D5;
+      --brand-kobold: #006298;
+      --brand-bleu:   #5691A1;
+      --brand-midori: #3E695C;
+      --brand-sahara: #D6A461;
+      --brand-boreal: #8B355F;
+      --brand-cotta:  #872526;
+      --brand-antar:  #BFE3ED;
+      --brand-azzay:  #79876D;
+      --brand-cloro:  #E2E99C;
+      --brand-arena:  #FAEDBC;
+      --brand-carota: #F87C56;
+      --brand-khewra: #DC625E;
+      --brand-nubia:  #FBDD7A;
+      --brand-calla:  #F4C3CC;
+
+      --background:       var(--neutral-black);
+      --foreground:       var(--neutral-100);
+      --card:             var(--neutral-900);
+      --card-foreground:  var(--neutral-100);
+      --muted:            var(--neutral-800);
+      --muted-foreground: var(--neutral-500);
+      --primary:          var(--neutral-white);
+      --primary-fg:       var(--neutral-950);
+      --border:           rgba(255, 255, 255, 0.10);
+      --border-hover:     rgba(255, 255, 255, 0.18);
+      --ring:             var(--neutral-600);
+
+      --guide-heavy:    var(--brand-kobold);
+      --guide-soft:     var(--brand-antar);
+      --info:           var(--brand-atmos);
+      --success-heavy:  var(--brand-midori);
+      --success-soft:   var(--brand-cloro);
+      --warning:        var(--brand-sahara);
+      --warning-soft:   var(--brand-nubia);
+      --error-heavy:    var(--brand-cotta);
+      --error-soft:     var(--brand-calla);
+
+      --accent-primary:   var(--neutral-white);
+      --accent-on-primary: var(--neutral-black);
+      --accent-soft:      var(--guide-soft);
+      --accent-lime:      var(--success-soft);
+      --accent-coral:     var(--brand-carota);
+      --accent-yellow:    var(--warning-soft);
+      --accent-teal:      var(--info);
+
+      --font-outfit:  "Outfit", ui-sans-serif, system-ui, sans-serif;
+      --font-heading: var(--font-outfit);
+      --font-body:    "Inter",  ui-sans-serif, system-ui, sans-serif;
+      --font-mono:    "JetBrains Mono", ui-monospace, monospace;
+
+      --radius-min: 4px;
+      --radius-xxs: 6px;
+      --radius-xs:  8px;
+      --radius-sm:  12px;
+      --radius-md:  16px;
+      --radius-lg:  24px;
+      --radius-xl:  32px;
+      --radius-xxl: 48px;
+      --radius-max: 100%;
+
+      --shadow-sm: 0 0 16px 0 rgba(0,0,0,.20);
+      --shadow-md: 0 4px 16px 0 rgba(0,0,0,.20);
+      --shadow-lg: 0 8px 16px 0 rgba(0,0,0,.20);
+
+      --sp-1: .25rem;  --sp-2: .5rem;   --sp-3: .75rem;  --sp-4: 1rem;
+      --sp-5: 1.25rem; --sp-6: 1.5rem;  --sp-8: 2rem;    --sp-10: 2.5rem;
+      --sp-12: 3rem;   --sp-16: 4rem;   --sp-20: 5rem;   --sp-24: 6rem;
+      --sp-32: 8rem;
+
+      --max-w: 90rem;
+      --px: clamp(1rem, 4vw, 3rem);
+
+      --ease: cubic-bezier(.4,0,.2,1);
+      --dur: .22s;
+    }
+
+    /* ─────────────────────────────────────────────
+       RESET
+       ───────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+    body {
+      background: var(--background);
+      color: var(--foreground);
+      font-family: var(--font-body);
+      font-size: 1rem;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+    img, svg { display: block; max-width: 100%; }
+    a { color: inherit; text-decoration: none; }
+    button { cursor: pointer; border: none; background: none; font: inherit; color: inherit; }
+    ul, ol { list-style: none; }
+
+    /* ─────────────────────────────────────────────
+       LAYOUT
+       ───────────────────────────────────────────── */
+    .wrap  { width: 100%; max-width: var(--max-w); margin-inline: auto; padding-inline: var(--px); }
+    .sec   { padding-block: clamp(var(--sp-16), 8vw, var(--sp-24)); }
+    .sec--alt { background: #090909; }
+
+    /* ─────────────────────────────────────────────
+       TIPOGRAFIA
+       ───────────────────────────────────────────── */
+    .eyebrow {
+      font-family: var(--font-outfit);
+      font-size: .6875rem; font-weight: 600;
+      letter-spacing: .12em; text-transform: uppercase;
+      color: var(--muted-foreground);
+    }
+    .eyebrow--accent { color: var(--neutral-400); }
+
+    h1,h2,h3,h4 { font-family: var(--font-heading); line-height: 1.08; letter-spacing: -.03em; }
+
+    .t-xl  { font-size: clamp(2.25rem,6vw,4.25rem); font-weight: 400; text-transform: uppercase; letter-spacing: .02em; }
+    .t-lg  { font-size: clamp(1.875rem,5vw,3rem);    font-weight: 500; text-transform: uppercase; letter-spacing: .05em; line-height: 1.1; }
+    .t-md  { font-size: clamp(1.25rem, 3vw,1.875rem); font-weight: 500; text-transform: uppercase; letter-spacing: .04em; }
+    .t-sm  { font-size: clamp(1rem,   2vw, 1.25rem);  font-weight: 500; text-transform: uppercase; letter-spacing: .03em; }
+    .t-xs  { font-size: .9375rem; font-weight: 600; text-transform: uppercase; letter-spacing: .03em; }
+
+    .body-lg { font-size: clamp(1.0625rem,1.5vw,1.1875rem); line-height: 1.78; color: var(--muted-foreground); }
+    .body-sm { font-size: .9375rem; line-height: 1.7;  color: var(--muted-foreground); }
+    .body-xs { font-size: .8125rem; line-height: 1.65; color: var(--muted-foreground); }
+
+    .text-accent   { color: var(--accent-primary); }
+    .text-lime     { color: var(--brand-cloro); }
+    .text-orange   { color: var(--brand-carota); }
+    .text-amber    { color: var(--brand-nubia); }
+    .text-sky      { color: var(--brand-atmos); }
+    .text-muted    { color: var(--muted-foreground); }
+
+    /* ─────────────────────────────────────────────
+       BOTÕES
+       ───────────────────────────────────────────── */
+    .btn {
+      display: inline-flex; align-items: center; gap: var(--sp-2);
+      padding: var(--sp-3) var(--sp-6);
+      border-radius: 999px;
+      font-family: var(--font-outfit); font-size: .8125rem; font-weight: 600;
+      letter-spacing: .1em; text-transform: uppercase; white-space: nowrap;
+      transition: all var(--dur) var(--ease);
+    }
+    .btn--solid {
+      background: var(--neutral-white); color: var(--neutral-black);
+    }
+    .btn--solid:hover { background: var(--neutral-200); transform: translateY(-1px); }
+
+    .btn--ghost {
+      background: transparent; color: var(--foreground);
+      border: 1px solid rgba(255,255,255,.18);
+    }
+    .btn--ghost:hover { background: rgba(255,255,255,.07); border-color: rgba(255,255,255,.30); }
+
+    /* ─────────────────────────────────────────────
+       NAV
+       ───────────────────────────────────────────── */
+    .nav {
+      position: fixed; inset: 0 0 auto; z-index: 100;
+      border-bottom: 1px solid transparent;
+      transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease);
+    }
+    .nav.scrolled {
+      background: rgba(0,0,0,.88); backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px); border-color: var(--border);
+    }
+    .nav__inner {
+      display: flex; align-items: center; justify-content: space-between;
+      padding-block: var(--sp-4);
+    }
+    .nav__logo {
+      display: flex; align-items: center;
+    }
+    .nav__logo svg { height: 1.5rem; width: auto; display: block; }
+    .nav__links {
+      display: flex; align-items: center; gap: var(--sp-1);
+    }
+    .nav__link {
+      font-family: var(--font-outfit); font-size: .8125rem; font-weight: 500;
+      text-transform: uppercase; letter-spacing: .08em;
+      color: var(--muted-foreground); padding: var(--sp-2) var(--sp-3);
+      border-radius: var(--radius-xs);
+      transition: color var(--dur) var(--ease), background var(--dur) var(--ease);
+    }
+    .nav__link:hover { color: var(--foreground); background: rgba(255,255,255,.05); }
+
+    /* Mobile menu toggle */
+    .nav__toggle {
+      display: none; flex-direction: column; flex-wrap: wrap;
+      width: 2rem; height: 2rem; align-items: center; justify-content: center;
+      gap: 3.5px; padding: .25rem;
+      background: transparent; border: 1px solid var(--border);
+      border-radius: var(--radius-xs); cursor: pointer;
+      transition: border-color var(--dur) var(--ease), background var(--dur) var(--ease);
+    }
+    .nav__toggle:hover { border-color: var(--border-hover); background: rgba(255,255,255,.05); }
+    .nav__toggle__dot {
+      width: 3.5px; height: 3.5px; border-radius: 50%;
+      background: var(--muted-foreground); transition: background var(--dur) var(--ease);
+      flex-shrink: 0;
+    }
+    .nav__toggle:hover .nav__toggle__dot { background: var(--foreground); }
+
+    /* Mobile menu overlay */
+    .nav-mobile {
+      position: fixed; inset: 0; z-index: 200;
+      background: rgba(0,0,0,.96); backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      display: flex; flex-direction: column;
+      padding: var(--sp-6) var(--sp-5);
+      opacity: 0; pointer-events: none;
+      transition: opacity .25s var(--ease);
+    }
+    .nav-mobile.open { opacity: 1; pointer-events: all; }
+    .nav-mobile__header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: var(--sp-8);
+    }
+    .nav-mobile__close {
+      width: 2.5rem; height: 2.5rem; display: flex; align-items: center; justify-content: center;
+      background: rgba(255,255,255,.06); border: 1px solid var(--border);
+      border-radius: var(--radius-xs); cursor: pointer; color: var(--foreground);
+      transition: background var(--dur) var(--ease);
+    }
+    .nav-mobile__close:hover { background: rgba(255,255,255,.12); }
+    .nav-mobile__links {
+      display: flex; flex-direction: column; gap: var(--sp-2); flex: 1;
+    }
+    .nav-mobile__link {
+      font-family: var(--font-outfit); font-size: 1.5rem; font-weight: 600;
+      color: var(--muted-foreground); padding: var(--sp-3) var(--sp-4);
+      border-radius: var(--radius-sm);
+      transition: color var(--dur) var(--ease), background var(--dur) var(--ease);
+      display: flex; align-items: center; gap: var(--sp-3);
+    }
+    .nav-mobile__link:hover { color: var(--foreground); background: rgba(255,255,255,.04); }
+    .nav-mobile__link--top {
+      font-size: 1rem; opacity: .6;
+      margin-bottom: var(--sp-2); padding-bottom: var(--sp-4);
+      border-bottom: 1px solid var(--border);
+    }
+
+    /* ─────────────────────────────────────────────
+       HERO
+       ───────────────────────────────────────────── */
+    .hero {
+      min-height: 100svh; display: flex; align-items: center;
+      padding-top: 6rem; position: relative; overflow: hidden;
+    }
+    .hero::before {
+      content: ""; position: absolute; inset: 0; pointer-events: none;
+      background:
+        radial-gradient(ellipse 55% 60% at 5% 30%, rgba(226,233,156,.10) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 50% at 85% 75%, rgba(251,221,122,.07) 0%, transparent 65%),
+        radial-gradient(ellipse 40% 45% at 55% 10%, rgba(248,124,86,.04) 0%, transparent 60%);
+    }
+    .hero__inner {
+      position: relative; z-index: 1;
+      padding-block: var(--sp-10) var(--sp-10);
+    }
+    /* Stats */
+    .hero__stats {
+      display: flex; flex-wrap: wrap; gap: var(--sp-8);
+      margin-top: var(--sp-10); padding-top: var(--sp-8);
+      border-top: 1px solid var(--border);
+    }
+    .hero__stat-num {
+      font-family: var(--font-heading); font-size: 2rem; font-weight: 400;
+      line-height: 1; letter-spacing: -.02em;
+      background: linear-gradient(135deg, var(--neutral-white) 0%, var(--neutral-500) 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .hero__stat-label {
+      font-family: var(--font-outfit); font-size: .6875rem; font-weight: 500;
+      letter-spacing: .08em; text-transform: uppercase;
+      color: var(--muted-foreground); margin-top: var(--sp-1);
+    }
+    /* Feature pills strip */
+    .hero__features {
+      display: flex; flex-wrap: wrap; gap: var(--sp-2);
+      margin-top: var(--sp-8);
+    }
+    .hero__feature {
+      display: inline-flex; align-items: center; gap: var(--sp-2);
+      padding: var(--sp-2) var(--sp-4);
+      background: rgba(226,233,156,.07);
+      border: 1px solid rgba(226,233,156,.22);
+      border-radius: 999px;
+      font-family: var(--font-outfit); font-size: .75rem; font-weight: 600;
+      text-transform: uppercase; letter-spacing: .07em;
+      color: var(--neutral-300);
+      transition: background .2s, border-color .2s, color .2s;
+    }
+    .hero__feature:hover {
+      background: rgba(226,233,156,.12);
+      border-color: rgba(226,233,156,.38);
+      color: var(--foreground);
+    }
+    .hero__feature .material-symbols-outlined {
+      font-size: .9375rem; color: var(--brand-cloro);
+    }
+    .hero__tag {
+      display: inline-flex; align-items: center; gap: var(--sp-2);
+      margin-bottom: var(--sp-8);
+      padding: var(--sp-2) var(--sp-4);
+      background: rgba(226,233,156,.09);
+      border: 1px solid rgba(226,233,156,.28);
+      border-radius: 999px;
+    }
+    .hero__dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--brand-cloro);
+      animation: pulse-dot 2s ease-in-out infinite;
+    }
+    @keyframes pulse-dot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(.75)} }
+    .hero__title {
+      max-width: 100%;
+      margin-bottom: var(--sp-6);
+      text-wrap: balance;
+      line-height: 1.05;
+    }
+    .hero__title em {
+      font-style: normal;
+      color: var(--neutral-white);
+      -webkit-text-fill-color: var(--neutral-white);
+    }
+    .hero__sub {
+      max-width: 52ch;
+      margin-bottom: var(--sp-10);
+    }
+    .hero__acts {
+      display: flex; flex-wrap: wrap; gap: var(--sp-4);
+    }
+
+    /* ─────────────────────────────────────────────
+       HUB — CATEGORIAS
+       ───────────────────────────────────────────── */
+    .hub-sec {
+      background: var(--background);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+    .hub-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: var(--sp-5);
+    }
+    .hub-card {
+      display: flex; flex-direction: column; gap: var(--sp-4);
+      padding: var(--sp-6);
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      text-decoration: none; color: inherit;
+      transition: border-color var(--dur) var(--ease), transform var(--dur) var(--ease), background var(--dur) var(--ease);
+      position: relative; overflow: hidden;
+    }
+    .hub-card::before {
+      content: ""; position: absolute; inset: 0;
+      background: linear-gradient(135deg, transparent 60%, rgba(255,255,255,.015) 100%);
+      pointer-events: none;
+    }
+    .hub-card:hover {
+      border-color: var(--border-hover);
+      transform: translateY(-2px);
+      background: #282828;
+    }
+    .hub-card__icon {
+      font-size: 1.5rem;
+      line-height: 1;
+      color: var(--muted-foreground);
+    }
+    .hub-card__title {
+      font-family: var(--font-heading); font-size: 1rem; font-weight: 600;
+      color: var(--foreground); line-height: 1.2;
+      text-transform: uppercase; letter-spacing: .06em;
+    }
+    .hub-card__desc {
+      font-size: .875rem; color: var(--muted-foreground); line-height: 1.65;
+    }
+    .hub-card__arrow {
+      margin-top: auto;
+      transition: transform var(--dur) var(--ease), color var(--dur) var(--ease);
+    }
+    .hub-card:hover .hub-card__arrow {
+      transform: translateX(3px);
+      color: var(--foreground);
+    }
+
+    /* Color variants */
+    .hub-card--teal:hover { border-color: rgba(119,197,213,.3); }
+    .hub-card--lime:hover { border-color: rgba(226,233,156,.3); }
+    .hub-card--orange:hover { border-color: rgba(248,124,86,.3); }
+    .hub-card--amber:hover { border-color: rgba(251,221,122,.3); }
+    .hub-card--kobold:hover { border-color: rgba(0,98,152,.4); }
+    .hub-card--coral:hover { border-color: rgba(220,98,94,.3); }
+
+    /* ─────────────────────────────────────────────
+       SECTION HEADER
+       ───────────────────────────────────────────── */
+    .sec-header { margin-bottom: clamp(var(--sp-10),5vw,var(--sp-16)); }
+    .sec-header .eyebrow { margin-bottom: var(--sp-3); }
+    .sec-header .t-lg    { max-width: 22ch; margin-bottom: var(--sp-4); }
+    .sec-header .body-lg { max-width: 54ch; }
+
+    /* ─────────────────────────────────────────────
+       PROMPT CARDS
+       ───────────────────────────────────────────── */
+    .prompt-grid {
+      display: grid;
+      gap: var(--sp-5);
+    }
+    .prompt-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      transition: border-color var(--dur) var(--ease);
+    }
+    .prompt-card:hover { border-color: var(--border-hover); }
+    .prompt-card__header {
+      padding: var(--sp-6);
+      display: flex;
+      align-items: flex-start;
+      gap: var(--sp-4);
+      cursor: pointer;
+      transition: background var(--dur) var(--ease);
+    }
+    .prompt-card__header:hover { background: rgba(255,255,255,.02); }
+    .prompt-card__icon {
+      width: 48px; height: 48px;
+      border-radius: var(--radius-sm);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.5rem;
+      flex-shrink: 0;
+    }
+    .prompt-card__icon--1 { background: rgba(226,233,156,.12); }
+    .prompt-card__icon--2 { background: rgba(119,197,213,.10); }
+    .prompt-card__icon--3 { background: rgba(248,124,86,.10); }
+    .prompt-card__icon--4 { background: rgba(251,221,122,.10); }
+    .prompt-card__icon--5 { background: rgba(0,98,152,.12); }
+    .prompt-card__icon--6 { background: rgba(220,98,94,.10); }
+
+    .prompt-card__content { flex: 1; }
+    .prompt-card__title {
+      font-family: var(--font-heading);
+      font-size: 1.125rem; font-weight: 600;
+      text-transform: uppercase; letter-spacing: .04em;
+      margin-bottom: var(--sp-2);
+    }
+    .prompt-card__subtitle {
+      font-size: .875rem;
+      color: var(--muted-foreground);
+      line-height: 1.6;
+    }
+    .prompt-card__expand {
+      flex-shrink: 0;
+      width: 32px; height: 32px;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: var(--radius-xs);
+      background: rgba(255,255,255,.05);
+      color: var(--muted-foreground);
+      transition: all var(--dur) var(--ease);
+    }
+    .prompt-card__header:hover .prompt-card__expand {
+      background: rgba(255,255,255,.10);
+      color: var(--foreground);
+    }
+    .prompt-card__body {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height .3s var(--ease);
+    }
+    .prompt-card.is-open .prompt-card__body {
+      max-height: 3000px;
+    }
+    .prompt-card.is-open .prompt-card__expand {
+      transform: rotate(180deg);
+    }
+    .prompt-card__inner {
+      padding: 0 var(--sp-6) var(--sp-6) var(--sp-6);
+      border-top: 1px solid var(--border);
+    }
+
+    .prompt-code {
+      background: #0D0D0D;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: var(--sp-5);
+      margin-top: var(--sp-5);
+      position: relative;
+    }
+    .prompt-code__label {
+      font-family: var(--font-outfit);
+      font-size: .6875rem; font-weight: 600;
+      letter-spacing: .1em; text-transform: uppercase;
+      color: var(--brand-cloro);
+      margin-bottom: var(--sp-3);
+    }
+    .prompt-code__text {
+      font-family: var(--font-mono);
+      font-size: .8125rem;
+      line-height: 1.7;
+      color: var(--neutral-300);
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .prompt-code__copy {
+      position: absolute;
+      top: var(--sp-3);
+      right: var(--sp-3);
+      padding: var(--sp-2) var(--sp-3);
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: var(--radius-xs);
+      font-family: var(--font-outfit);
+      font-size: .6875rem; font-weight: 600;
+      letter-spacing: .08em; text-transform: uppercase;
+      color: var(--muted-foreground);
+      transition: all var(--dur) var(--ease);
+      cursor: pointer;
+    }
+    .prompt-code__copy:hover {
+      background: rgba(255,255,255,.12);
+      color: var(--foreground);
+    }
+
+    .prompt-tips {
+      margin-top: var(--sp-5);
+      padding: var(--sp-4);
+      background: rgba(226,233,156,.05);
+      border: 1px solid rgba(226,233,156,.15);
+      border-radius: var(--radius-sm);
+    }
+    .prompt-tips__title {
+      font-family: var(--font-outfit);
+      font-size: .75rem; font-weight: 600;
+      letter-spacing: .1em; text-transform: uppercase;
+      color: var(--brand-cloro);
+      margin-bottom: var(--sp-3);
+      display: flex;
+      align-items: center;
+      gap: var(--sp-2);
+    }
+    .prompt-tips ul {
+      display: flex;
+      flex-direction: column;
+      gap: var(--sp-2);
+    }
+    .prompt-tips li {
+      font-size: .875rem;
+      color: var(--muted-foreground);
+      line-height: 1.65;
+      padding-left: var(--sp-4);
+      position: relative;
+    }
+    .prompt-tips li::before {
+      content: "→";
+      position: absolute;
+      left: 0;
+      color: var(--brand-cloro);
+    }
+
+    /* ─────────────────────────────────────────────
+       TUTORIAL STEPS — acordeão
+       ───────────────────────────────────────────── */
+    .tutorial-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--sp-4);
+      align-items: start;
+    }
+    .tut-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: var(--radius-md); overflow: hidden;
+      transition: border-color var(--dur) var(--ease);
+    }
+    .tut-card:hover { border-color: var(--border-hover); }
+    .tut-card__header {
+      display: flex; align-items: center; gap: var(--sp-3);
+      padding: var(--sp-5); cursor: pointer;
+      transition: background var(--dur) var(--ease);
+    }
+    .tut-card__header:hover { background: rgba(255,255,255,.02); }
+    .tut-card__num {
+      width: 34px; height: 34px; border-radius: var(--radius-xs);
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-outfit); font-size: .8125rem; font-weight: 700;
+      flex-shrink: 0;
+    }
+    .tut-card__num--teal  { background: rgba(119,197,213,.12); color: var(--brand-atmos); }
+    .tut-card__num--lime  { background: rgba(226,233,156,.10); color: var(--brand-cloro); }
+    .tut-card__num--coral { background: rgba(248,124,86,.10);  color: var(--brand-carota); }
+    .tut-card__num--amber { background: rgba(251,221,122,.10); color: var(--brand-nubia); }
+    .tut-card__num--kobold{ background: rgba(0,98,152,.12);    color: var(--brand-antar); }
+    .tut-card__info { flex: 1; min-width: 0; }
+    .tut-card__title {
+      font-family: var(--font-heading); font-size: .9375rem; font-weight: 600;
+      text-transform: uppercase; letter-spacing: .04em; line-height: 1.2;
+    }
+    .tut-card__sub {
+      font-size: .75rem; color: var(--muted-foreground);
+      margin-top: var(--sp-1); line-height: 1.4;
+    }
+    .tut-card__chevron {
+      flex-shrink: 0; color: var(--muted-foreground);
+      transition: transform var(--dur) var(--ease), color var(--dur) var(--ease);
+      font-size: 1.125rem;
+    }
+    .tut-card.is-open .tut-card__chevron { transform: rotate(180deg); color: var(--foreground); }
+    .tut-card__body {
+      max-height: 0; overflow: hidden;
+      transition: max-height .3s var(--ease);
+    }
+    .tut-card.is-open .tut-card__body { max-height: 1200px; }
+    .tut-card__inner {
+      padding: 0 var(--sp-5) var(--sp-5);
+      border-top: 1px solid var(--border);
+    }
+    .tut-card__desc {
+      font-size: .9rem; color: var(--muted-foreground); line-height: 1.75;
+      margin-top: var(--sp-4); margin-bottom: var(--sp-3);
+    }
+    .tut-card__desc strong { color: var(--foreground); }
+    .tut-card__list {
+      display: flex; flex-direction: column; gap: var(--sp-2); padding-left: 0;
+    }
+    .tut-card__list li {
+      font-size: .875rem; color: var(--muted-foreground); line-height: 1.65;
+      padding-left: var(--sp-5); position: relative;
+    }
+    .tut-card__list li::before { content: "→"; position: absolute; left: 0; color: var(--brand-cloro); }
+    .tut-card__tip {
+      margin-top: var(--sp-4); padding: var(--sp-3) var(--sp-4);
+      background: rgba(226,233,156,.05); border: 1px solid rgba(226,233,156,.15);
+      border-radius: var(--radius-xs);
+      font-size: .8125rem; color: var(--muted-foreground); line-height: 1.6;
+    }
+    .tut-card__tip strong { color: var(--brand-cloro); }
+
+    /* Tabela de parâmetros */
+    .params-table {
+      width: 100%; border-collapse: collapse;
+      font-size: .875rem; margin-top: var(--sp-4);
+    }
+    .params-table th {
+      font-family: var(--font-outfit); font-size: .6875rem; font-weight: 600;
+      letter-spacing: .08em; text-transform: uppercase;
+      color: var(--muted-foreground); text-align: left;
+      padding: var(--sp-2) var(--sp-3); border-bottom: 1px solid var(--border);
+    }
+    .params-table td {
+      padding: var(--sp-2) var(--sp-3); color: var(--muted-foreground);
+      line-height: 1.6; border-bottom: 1px solid rgba(255,255,255,.04);
+      vertical-align: top;
+    }
+    .params-table td:first-child { color: var(--foreground); font-weight: 500; white-space: nowrap; }
+    .params-table tr:last-child td { border-bottom: none; }
+    .params-table__rec {
+      display: inline-block; padding: .1em .45em;
+      background: rgba(226,233,156,.10); border: 1px solid rgba(226,233,156,.25);
+      border-radius: var(--radius-min);
+      font-family: var(--font-mono); font-size: .75rem; color: var(--brand-cloro);
+    }
+
+    /* ─────────────────────────────────────────────
+       WORKFLOW CARDS
+       ───────────────────────────────────────────── */
+    .workflow-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: var(--sp-6);
+    }
+    .workflow-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: var(--sp-8);
+      transition: border-color var(--dur) var(--ease), transform var(--dur) var(--ease);
+    }
+    .workflow-card:hover {
+      border-color: var(--border-hover);
+      transform: translateY(-2px);
+    }
+    .workflow-card__number {
+      width: 40px; height: 40px;
+      border-radius: var(--radius-sm);
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-outfit);
+      font-size: 1.25rem; font-weight: 700;
+      margin-bottom: var(--sp-5);
+    }
+    .workflow-card:nth-child(1) .workflow-card__number { background: rgba(226,233,156,.10); color: var(--brand-cloro); }
+    .workflow-card:nth-child(2) .workflow-card__number { background: rgba(251,221,122,.10); color: var(--brand-nubia); }
+    .workflow-card:nth-child(3) .workflow-card__number { background: rgba(248,124,86,.10);  color: var(--brand-carota); }
+
+    .workflow-card__title {
+      font-family: var(--font-heading);
+      font-size: 1.125rem; font-weight: 600;
+      text-transform: uppercase; letter-spacing: .04em;
+      margin-bottom: var(--sp-4);
+    }
+    .workflow-card__steps {
+      display: flex;
+      flex-direction: column;
+      gap: var(--sp-3);
+    }
+    .workflow-card__steps li {
+      font-size: .9375rem;
+      color: var(--muted-foreground);
+      line-height: 1.7;
+      padding-left: var(--sp-5);
+      position: relative;
+    }
+    .workflow-card__steps li::before {
+      content: "•";
+      position: absolute;
+      left: var(--sp-2);
+      color: var(--neutral-600);
+    }
+
+    /* ─────────────────────────────────────────────
+       FOOTER
+       ───────────────────────────────────────────── */
+    .footer {
+      border-top: 1px solid var(--border);
+      padding-block: var(--sp-10);
+    }
+    .footer__inner {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--sp-6);
+    }
+    .footer__logo {
+      display: flex; align-items: center;
+    }
+    .footer__logo svg { height: 1.25rem; width: auto; display: block; }
+    .footer__links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--sp-6);
+    }
+    .footer__link {
+      font-size: .875rem;
+      color: var(--muted-foreground);
+      transition: color var(--dur) var(--ease);
+    }
+    .footer__link:hover {
+      color: var(--foreground);
+    }
+
+    /* Scroll offset para nav fixa */
+    section[id], #inicio { scroll-margin-top: 5rem; }
+
+    /* Focus acessível */
+    .prompt-card__header:focus-visible {
+      outline: 2px solid var(--brand-cloro);
+      outline-offset: -2px;
+      border-radius: var(--radius-xxs);
+    }
+
+    /* Seção ativa no mobile nav */
+    .nav-mobile__link.active {
+      color: var(--foreground);
+      background: rgba(255,255,255,.07);
+    }
+
+    /* Workflow expandido */
+    .workflow-card__step {
+      display: grid;
+      grid-template-columns: 1.5rem 1fr;
+      gap: var(--sp-3);
+      align-items: start;
+      font-size: .9375rem;
+      color: var(--muted-foreground);
+      line-height: 1.7;
+      padding-bottom: var(--sp-3);
+      border-bottom: 1px solid rgba(255,255,255,.04);
+    }
+    .workflow-card__step:last-child { border-bottom: none; padding-bottom: 0; }
+    .workflow-card__step-num {
+      font-family: var(--font-outfit); font-size: .6875rem; font-weight: 700;
+      color: inherit; opacity: .5; padding-top: .25rem;
+    }
+    .workflow-card__tip {
+      margin-top: var(--sp-5); padding: var(--sp-4);
+      background: rgba(226,233,156,.04); border: 1px solid rgba(226,233,156,.12);
+      border-radius: var(--radius-xs);
+      font-size: .8125rem; color: var(--muted-foreground); line-height: 1.65;
+    }
+    .workflow-card__tip strong { color: var(--brand-cloro); }
+
+    /* ─────────────────────────────────────────────
+       MATERIAL SYMBOLS
+       ───────────────────────────────────────────── */
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 300, 'opsz' 24, 'GRAD' 0;
+      line-height: 1; display: inline-flex; align-items: center; justify-content: center;
+      user-select: none; font-size: inherit;
+    }
+    .hub-card__icon .material-symbols-outlined { font-size: 1.375rem; }
+    .hub-card__arrow .material-symbols-outlined { font-size: 1rem; }
+
+    /* ─────────────────────────────────────────────
+       RESPONSIVO
+       ───────────────────────────────────────────── */
+    @media (max-width: 768px) {
+      .nav__links { display: none; }
+      .nav__toggle { display: flex; }
+      .hero { padding-top: 4.5rem; }
+      .hero__inner { padding-block: var(--sp-8) var(--sp-8); }
+      .hero__features { gap: var(--sp-2); }
+      .hero__stats { gap: var(--sp-5); }
+      .hub-grid { grid-template-columns: 1fr 1fr; }
+      .tutorial-grid { grid-template-columns: 1fr 1fr; }
+      .workflow-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 640px) {
+      .hero__inner { padding-block: var(--sp-6) var(--sp-6); }
+      .hero__stats { gap: var(--sp-4); margin-top: var(--sp-8); padding-top: var(--sp-6); }
+      .hero__stat-num { font-size: 1.625rem; }
+      .hub-grid { grid-template-columns: 1fr; }
+      .tutorial-grid { grid-template-columns: 1fr; }
+      .params-table { font-size: .8125rem; }
+      .params-table th, .params-table td { padding: var(--sp-2) var(--sp-3); }
+      .sec { padding-block: var(--sp-12); }
+      .sec-header { margin-bottom: var(--sp-8); }
+      .prompt-card__header { padding: var(--sp-5); gap: var(--sp-3); }
+      .prompt-card__icon { width: 36px; height: 36px; }
+      .workflow-card { padding: var(--sp-6); }
+    }
+
+    @media (max-width: 480px) {
+      .hero { min-height: auto; padding-bottom: var(--sp-12); }
+      .hero__acts { flex-direction: column; width: 100%; }
+      .btn { width: 100%; justify-content: center; }
+      .hub-card { padding: var(--sp-5); }
+      .prompt-card__inner { padding: 0 var(--sp-5) var(--sp-5); }
+      .footer__inner { flex-direction: column; text-align: center; }
+    }
+
+    /* ─── MOBILE MUITO PEQUENO (≤ 360px) ─── */
+    @media (max-width: 360px) {
+      .t-xl { font-size: 2.25rem; }
+      .btn { font-size: .8125rem; padding: var(--sp-3) var(--sp-5); }
+      .hub-card { padding: var(--sp-3) var(--sp-4); }
+      .prompt-card__header { padding: var(--sp-4); }
+      .prompt-code { padding: var(--sp-4); }
+      .prompt-code__text { font-size: .75rem; }
+      .workflow-card { padding: var(--sp-5); }
+      .hero__stat-num { font-size: 1.375rem; }
+    }
+
+    /* ─── LARGE DESKTOP (1440px+) ─── */
+    @media (min-width: 1440px) {
+      :root {
+        --max-w: 88rem;
+        --px: clamp(2rem, 4vw, 4rem);
+      }
+      .hub-grid { grid-template-columns: repeat(3, 1fr); }
+      .t-xl { font-size: clamp(2.5rem, 5vw, 5rem); }
+      .t-lg { font-size: clamp(2rem, 3.5vw, 3.5rem); }
+    }
+
+    /* ─── WIDE (1920px+) ─── */
+    @media (min-width: 1920px) {
+      :root {
+        --max-w: 110rem;
+        --px: clamp(3rem, 4vw, 5rem);
+      }
+      .hub-grid { grid-template-columns: repeat(3, 1fr); }
+      .workflow-grid { grid-template-columns: repeat(3, 1fr); }
+      .t-xl { font-size: clamp(3rem, 4.5vw, 5.5rem); }
+      .t-lg { font-size: clamp(2.25rem, 3vw, 4rem); }
+    }
+
+    /* ─── ULTRAWIDE (2560px+) ─── */
+    @media (min-width: 2560px) {
+      :root {
+        --max-w: 140rem;
+        --px: clamp(4rem, 5vw, 7rem);
+      }
+      .hub-grid { grid-template-columns: repeat(3, 1fr); }
+      .workflow-grid { grid-template-columns: repeat(3, 1fr); }
+      .t-xl { font-size: clamp(3.5rem, 4vw, 6.5rem); }
+      .t-lg { font-size: clamp(2.5rem, 2.8vw, 4.5rem); }
+      .prompt-grid { gap: var(--sp-6); }
+      .workflow-card { padding: var(--sp-10); }
+    }
+
+    /* ─── CELULAR ULTRA FINO (≤ 320px) ─── */
+    @media (max-width: 320px) {
+      :root { --px: .75rem; }
+      .t-xl { font-size: 1.875rem; }
+      .btn { font-size: .75rem; padding: var(--sp-2) var(--sp-4); }
+      .hero__stat-num { font-size: 1.25rem; }
+      .hero__stat-label { font-size: .625rem; }
+      .hub-card { padding: var(--sp-3); }
+      .prompt-card__header { padding: var(--sp-3); gap: var(--sp-2); }
+      .prompt-card__icon { width: 32px; height: 32px; font-size: 1.125rem; }
+      .prompt-code__text { font-size: .6875rem; }
+      .workflow-card { padding: var(--sp-4); }
+      .nav__logo svg { height: 1.125rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ═══════════════════════════════════════════
+       NAV
+       ═══════════════════════════════════════════ -->
+  <nav class="nav" id="mainNav">
+    <div class="wrap">
+      <div class="nav__inner">
+        <a href="#inicio" class="nav__logo" aria-label="Overlens">
+          <svg style="--fill-0:var(--neutral-white);" preserveAspectRatio="xMidYMid meet" viewBox="0 0 264 34" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Overlens">
+<path d="M17.1415 34C14.7474 34 12.513 33.5593 10.4381 32.6778C8.36326 31.7963 6.54377 30.5843 4.97965 29.0417C3.41553 27.4676 2.18658 25.6574 1.29279 23.6111C0.430931 21.5333 0 19.3139 0 16.9528C0 14.5917 0.430931 12.388 1.29279 10.3417C2.18658 8.29537 3.39957 6.50093 4.93177 4.95833C6.49589 3.38426 8.29942 2.17222 10.3423 1.32222C12.4172 0.440741 14.6517 0 17.0457 0C19.4398 0 21.6583 0.440741 23.7012 1.32222C25.7761 2.17222 27.5956 3.38426 29.1597 4.95833C30.7238 6.50093 31.9368 8.31111 32.7987 10.3889C33.6924 12.4352 34.1393 14.6389 34.1393 17C34.1393 19.3611 33.6924 21.5806 32.7987 23.6583C31.9368 25.7046 30.7238 27.4991 29.1597 29.0417C27.6275 30.5843 25.824 31.7963 23.7491 32.6778C21.7062 33.5593 19.5036 34 17.1415 34ZM17.0457 28.8056C19.3121 28.8056 21.2912 28.3019 22.983 27.2944C24.7067 26.287 26.0474 24.9019 27.005 23.1389C27.9946 21.3444 28.4893 19.2824 28.4893 16.9528C28.4893 15.2213 28.2021 13.6472 27.6275 12.2306C27.0848 10.7824 26.3028 9.53889 25.2813 8.5C24.2598 7.42963 23.0468 6.61111 21.6423 6.04445C20.2697 5.47778 18.7375 5.19444 17.0457 5.19444C14.8113 5.19444 12.8322 5.69815 11.1085 6.70556C9.41665 7.68148 8.07597 9.05093 7.08642 10.8139C6.1288 12.5769 5.64999 14.6231 5.64999 16.9528C5.64999 18.6843 5.92131 20.2898 6.46397 21.7694C7.03854 23.2176 7.8206 24.4611 8.81015 25.5C9.83162 26.5389 11.0446 27.3574 12.4491 27.9556C13.8536 28.5222 15.3858 28.8056 17.0457 28.8056Z" fill="var(--fill-0, black)"/>
+<path d="M226.573 34C223.924 34 221.673 33.5278 219.822 32.5833C217.97 31.6389 216.31 30.2537 214.842 28.4278L218.577 24.7444C219.502 26.0667 220.604 27.1056 221.881 27.8611C223.157 28.5852 224.785 28.9472 226.764 28.9472C228.616 28.9472 230.084 28.5694 231.17 27.8139C232.287 27.0583 232.845 26.0194 232.845 24.6972C232.845 23.5954 232.558 22.6981 231.984 22.0056C231.409 21.313 230.643 20.7463 229.685 20.3056C228.76 19.8333 227.722 19.4241 226.573 19.0778C225.456 18.7 224.323 18.2907 223.173 17.85C222.056 17.3778 221.019 16.7954 220.061 16.1028C219.135 15.4102 218.385 14.513 217.811 13.4111C217.236 12.3093 216.949 10.9083 216.949 9.20833C216.949 7.25648 217.428 5.6037 218.385 4.25C219.375 2.86482 220.7 1.81019 222.359 1.08611C224.019 0.362037 225.871 0 227.914 0C230.116 0 232.079 0.425 233.803 1.275C235.559 2.125 236.979 3.21111 238.064 4.53333L234.33 8.21667C233.372 7.1463 232.367 6.35926 231.313 5.85556C230.292 5.32037 229.111 5.05278 227.77 5.05278C226.11 5.05278 224.801 5.38333 223.844 6.04445C222.918 6.70556 222.455 7.63426 222.455 8.83056C222.455 9.83796 222.742 10.6565 223.317 11.2861C223.892 11.8843 224.642 12.4037 225.567 12.8444C226.525 13.2537 227.562 13.6472 228.68 14.025C229.829 14.4028 230.962 14.8278 232.079 15.3C233.228 15.7722 234.266 16.3861 235.192 17.1417C236.149 17.8657 236.915 18.8102 237.49 19.975C238.064 21.1398 238.352 22.6037 238.352 24.3667C238.352 27.3259 237.282 29.6713 235.144 31.4028C233.037 33.1343 230.18 34 226.573 34Z" fill="var(--fill-0, black)"/>
+<path fill-rule="evenodd" clip-rule="evenodd" d="M253.562 20.7778C251.551 20.7778 249.747 20.3213 248.151 19.4083C246.587 18.4639 245.358 17.2046 244.464 15.6306C243.571 14.0565 243.124 12.2935 243.124 10.3417C243.124 8.38982 243.555 6.64259 244.417 5.1C245.31 3.52593 246.539 2.28241 248.103 1.36944C249.668 0.456481 251.471 0 253.514 0C255.557 0 257.36 0.456481 258.925 1.36944C260.521 2.28241 261.766 3.52593 262.659 5.1C263.553 6.64259 264 8.38982 264 10.3417C264 12.2935 263.553 14.0722 262.659 15.6778C261.766 17.2519 260.537 18.4954 258.972 19.4083C257.408 20.3213 255.605 20.7778 253.562 20.7778ZM253.514 19.2667C255.27 19.2667 256.802 18.8731 258.111 18.0861C259.451 17.2991 260.505 16.2287 261.271 14.875C262.037 13.5213 262.42 12.0102 262.42 10.3417C262.42 8.67315 262.037 7.17778 261.271 5.85556C260.505 4.53333 259.451 3.4787 258.111 2.69167C256.802 1.90463 255.27 1.51111 253.514 1.51111C251.79 1.51111 250.258 1.90463 248.917 2.69167C247.609 3.4787 246.571 4.53333 245.805 5.85556C245.071 7.17778 244.704 8.67315 244.704 10.3417C244.704 12.0102 245.071 13.5213 245.805 14.875C246.571 16.2287 247.609 17.2991 248.917 18.0861C250.258 18.8731 251.79 19.2667 253.514 19.2667Z" fill="var(--fill-0, black)"/>
+<path d="M35.5189 0.472222L49.0693 33.5278H52.8998L66.546 0.472222H60.6566L51.0372 24.5938L41.5041 0.472222H35.5189Z" fill="var(--fill-0, black)"/>
+<path d="M71.3479 0.472222V33.5278H93.9V28.5694H76.8543V19.0306H92.272V14.2611H76.8543V5.43056H93.6606V0.472222H71.3479Z" fill="var(--fill-0, black)"/>
+<path d="M105.097 19.5028H106.516L117.977 33.5278H124.92L113.159 19.4705C114.847 19.3619 116.357 18.9791 117.689 18.3222C119.286 17.5352 120.514 16.4333 121.376 15.0167C122.27 13.6 122.717 11.9315 122.717 10.0111C122.717 8.18518 122.27 6.56389 121.376 5.14722C120.514 3.69908 119.286 2.56574 117.689 1.74722C116.093 0.897222 114.242 0.472222 112.135 0.472222H99.5904V33.5278H105.097V19.5028ZM105.097 15.0167V5.19444H111.896C113.588 5.19444 114.896 5.66667 115.822 6.61111C116.748 7.55556 117.211 8.72037 117.211 10.1056C117.211 11.6481 116.732 12.8602 115.774 13.7417C114.849 14.5917 113.54 15.0167 111.848 15.0167H105.097Z" fill="var(--fill-0, black)"/>
+<path d="M129.002 33.5278V0.472222H134.508V28.5694H150.309V33.5278H129.002Z" fill="var(--fill-0, black)"/>
+<path fill-rule="evenodd" clip-rule="evenodd" d="M155.327 0.472222V33.5278H177.879V28.5694H160.833V19.0306H176.251V14.2611H160.833V5.43056H177.64V0.472222H155.327Z" fill="var(--fill-0, black)"/>
+<path fill-rule="evenodd" clip-rule="evenodd" d="M205.116 23.282L187.4 0.472222H183.57V33.5278H189.076V10.718L206.792 33.5278H210.623V0.472222H205.116V23.282Z" fill="var(--fill-0, black)"/>
+<path d="M251.886 11.05H252.336L256.1 15.6778H258.398L254.488 11.0413C255.372 10.9899 256.1 10.7094 256.674 10.2C257.345 9.63333 257.68 8.86204 257.68 7.88611C257.68 6.97315 257.345 6.23333 256.674 5.66667C256.036 5.06852 255.206 4.76944 254.184 4.76944H250.067V15.6778H251.886V11.05ZM251.886 9.53889V6.32778H254.089C254.631 6.32778 255.062 6.48518 255.381 6.8C255.701 7.11481 255.86 7.49259 255.86 7.93333C255.86 8.43704 255.701 8.83056 255.381 9.11389C255.062 9.39722 254.631 9.53889 254.089 9.53889H251.886Z" fill="var(--fill-0, black)"/>
+</g>
+</svg>
+        </a>
+        <nav class="nav__links" aria-label="Navegação">
+          <a href="#tutorial" class="nav__link">Tutorial</a>
+          <a href="#categorias" class="nav__link">Categorias</a>
+          <a href="#workflows" class="nav__link">Workflows</a>
+        </nav>
+        <button class="nav__toggle" id="navToggle" aria-label="Abrir menu">
+          <span class="nav__toggle__dot"></span><span class="nav__toggle__dot"></span><span class="nav__toggle__dot"></span>
+          <span class="nav__toggle__dot"></span><span class="nav__toggle__dot"></span><span class="nav__toggle__dot"></span>
+          <span class="nav__toggle__dot"></span><span class="nav__toggle__dot"></span><span class="nav__toggle__dot"></span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Mobile menu -->
+  <div class="nav-mobile" id="navMobile">
+    <div class="nav-mobile__header">
+      <span class="eyebrow" style="opacity:.5">Menu</span>
+      <button class="nav-mobile__close" id="navClose">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+    <nav class="nav-mobile__links">
+      <a href="#inicio" class="nav-mobile__link nav-mobile__link--top">
+        <span class="material-symbols-outlined">arrow_upward</span> Início
+      </a>
+      <a href="#tutorial" class="nav-mobile__link">Tutorial</a>
+      <a href="#categorias" class="nav-mobile__link">Categorias</a>
+      <a href="#camera-movement" class="nav-mobile__link">Camera Movement</a>
+      <a href="#multi-shot" class="nav-mobile__link">Multi-Shot & Timeline</a>
+      <a href="#reference-system" class="nav-mobile__link">Sistema @Reference</a>
+      <a href="#reference-combos" class="nav-mobile__link">@Reference Combos</a>
+      <a href="#lighting" class="nav-mobile__link">Lighting & Mood</a>
+      <a href="#workflows" class="nav-mobile__link">Workflows</a>
+    </nav>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       HERO
+       ═══════════════════════════════════════════ -->
+  <section id="inicio" class="hero">
+    <div class="wrap">
+      <div class="hero__inner">
+        <div class="hero__tag">
+          <span class="hero__dot"></span>
+          <span class="eyebrow eyebrow--accent">Multi-Shot · Seedance 2.0 · ByteDance</span>
+        </div>
+        <h1 class="t-xl hero__title">Prompts & Workflows<br>que <em>funcionam</em></h1>
+        <p class="body-lg hero__sub">
+          Guia prático com prompts testados, workflows validados e técnicas de multi-shot cinematográfico para criar vídeos profissionais no Seedance 2.0.
+        </p>
+        <div class="hero__acts">
+          <a href="#categorias" class="btn btn--solid">
+            <span class="material-symbols-outlined">auto_awesome</span>
+            Ver Prompts
+          </a>
+          <a href="#workflows" class="btn btn--ghost">
+            <span class="material-symbols-outlined">schema</span>
+            Workflows
+          </a>
+        </div>
+
+        <!-- Stats -->
+        <div class="hero__stats">
+          <div class="hero__stat">
+            <div class="hero__stat-num">20</div>
+            <div class="hero__stat-label">Prompts Testados</div>
+          </div>
+          <div class="hero__stat">
+            <div class="hero__stat-num">5</div>
+            <div class="hero__stat-label">Seções Temáticas</div>
+          </div>
+          <div class="hero__stat">
+            <div class="hero__stat-num">3</div>
+            <div class="hero__stat-label">Workflows Completos</div>
+          </div>
+        </div>
+
+        <!-- Feature pills -->
+        <div class="hero__features">
+          <span class="hero__feature">
+            <span class="material-symbols-outlined">movie_filter</span>
+            Multi-Shot Nativo
+          </span>
+          <span class="hero__feature">
+            <span class="material-symbols-outlined">hub</span>
+            Sistema @Reference
+          </span>
+          <span class="hero__feature">
+            <span class="material-symbols-outlined">graphic_eq</span>
+            Áudio Sincronizado
+          </span>
+          <span class="hero__feature">
+            <span class="material-symbols-outlined">timer</span>
+            Timeline Prompting
+          </span>
+          <span class="hero__feature">
+            <span class="material-symbols-outlined">face</span>
+            Lip-Sync Fonema
+          </span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════
+       TUTORIAL
+       ═══════════════════════════════════════════ -->
+  <section id="tutorial" class="sec">
+    <div class="wrap">
+      <div class="sec-header">
+        <p class="eyebrow">Tutorial</p>
+        <h2 class="t-lg">Como usar o Seedance 2.0</h2>
+        <p class="body-lg">Do acesso à primeira geração: entenda a plataforma, o sistema @Reference e como extrair o máximo de cada prompt multi-shot.</p>
+      </div>
+
+      <!-- Passo a passo -->
+      <div class="tutorial-grid">
+
+        <!-- 1. Acessar -->
+        <div class="tut-card">
+          <div class="tut-card__header" role="button" tabindex="0" aria-expanded="false" onclick="toggleTut(this)">
+            <div class="tut-card__num tut-card__num--lime">01</div>
+            <div class="tut-card__info">
+              <div class="tut-card__title">Acessar o Seedance 2.0</div>
+              <div class="tut-card__sub">Higgsfield · CapCut · planos · créditos</div>
+            </div>
+            <span class="tut-card__chevron material-symbols-outlined">expand_more</span>
+          </div>
+          <div class="tut-card__body">
+            <div class="tut-card__inner">
+              <p class="tut-card__desc">
+                O Seedance 2.0 está disponível via <strong>Higgsfield Cinema Studio 3.0</strong>, CapCut e Imagine.Art. O Higgsfield é a plataforma com acesso mais completo e controle de referências.
+              </p>
+              <ul class="tut-card__list">
+                <li>Seedance 2.0 requer o <strong>plano Team</strong> no Higgsfield — não está disponível no plano gratuito</li>
+                <li>Alternativas: CapCut (integração completa) e Imagine.Art (acesso parcial)</li>
+                <li>Interface disponível em inglês. Os prompts também devem ser escritos em inglês para melhores resultados</li>
+                <li>Cada geração aceita até <strong>12 arquivos de referência</strong>: 9 imagens, 3 vídeos e 3 áudios simultâneos</li>
+              </ul>
+              <div class="tut-card__tip"><strong>Dica:</strong> Comece pelo CapCut para testar. Só migre para o plano Team do Higgsfield quando souber o que quer produzir.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. Modos de geração -->
+        <div class="tut-card">
+          <div class="tut-card__header" role="button" tabindex="0" aria-expanded="false" onclick="toggleTut(this)">
+            <div class="tut-card__num tut-card__num--teal">02</div>
+            <div class="tut-card__info">
+              <div class="tut-card__title">Escolher o Modo</div>
+              <div class="tut-card__sub">Text-to-Video · Image-to-Video · Motion Replication</div>
+            </div>
+            <span class="tut-card__chevron material-symbols-outlined">expand_more</span>
+          </div>
+          <div class="tut-card__body">
+            <div class="tut-card__inner">
+              <p class="tut-card__desc">O Seedance 2.0 oferece três modos de geração no Higgsfield Cinema Studio 3.0:</p>
+              <ul class="tut-card__list">
+                <li><strong>Text-to-Video:</strong> você escreve um prompt e o modelo gera do zero. Ideal para conceitos e storyboarding rápido</li>
+                <li><strong>Image-to-Video:</strong> você envia imagens de referência e o modelo usa como base visual. Melhor para consistência de personagens e estilo definido</li>
+                <li><strong>Motion Replication:</strong> você envia um vídeo de referência e o modelo replica a trajetória de movimento e linguagem de câmera em uma nova cena</li>
+              </ul>
+              <div class="tut-card__tip"><strong>Dica:</strong> Para a maioria dos casos use Image-to-Video com @Image de personagem. Os resultados são muito mais consistentes do que Text-to-Video puro.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. Escrever o prompt -->
+        <div class="tut-card">
+          <div class="tut-card__header" role="button" tabindex="0" aria-expanded="false" onclick="toggleTut(this)">
+            <div class="tut-card__num tut-card__num--coral">03</div>
+            <div class="tut-card__info">
+              <div class="tut-card__title">Escrever o Prompt</div>
+              <div class="tut-card__sub">estrutura · inglês · especificidade</div>
+            </div>
+            <span class="tut-card__chevron material-symbols-outlined">expand_more</span>
+          </div>
+          <div class="tut-card__body">
+            <div class="tut-card__inner">
+              <p class="tut-card__desc">Use sempre em <strong>inglês</strong> e siga esta estrutura para extrair o máximo do Seedance 2.0:</p>
+              <ul class="tut-card__list">
+                <li><strong>Tipo de plano e câmera:</strong> wide shot, medium shot, close-up, dolly push, tracking…</li>
+                <li><strong>Sujeito e ação:</strong> quem ou o que está na cena e o que faz, com verbos de movimento com limites</li>
+                <li><strong>Ambiente:</strong> onde acontece, elementos de cena, condições atmosféricas</li>
+                <li><strong>Iluminação:</strong> tipo de luz, temperatura de cor, direção, atmosfera</li>
+                <li><strong>Estilo visual:</strong> cinematic, editorial, vlog — escolha apenas um primário</li>
+                <li>Seja específico: "slow dolly push in for 3 seconds" é muito melhor que "camera moves"</li>
+              </ul>
+              <div class="tut-card__tip"><strong>Estrutura:</strong> [Camera/Shot] + [Subject + Action] + [Environment] + [Lighting] + [Visual Style]</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. Sistema @Reference -->
+        <div class="tut-card">
+          <div class="tut-card__header" role="button" tabindex="0" aria-expanded="false" onclick="toggleTut(this)">
+            <div class="tut-card__num tut-card__num--amber">04</div>
+            <div class="tut-card__info">
+              <div class="tut-card__title">Sistema @Reference</div>
+              <div class="tut-card__sub">@Image · @Video · @Audio · hierarquia</div>
+            </div>
+            <span class="tut-card__chevron material-symbols-outlined">expand_more</span>
+          </div>
+          <div class="tut-card__body">
+            <div class="tut-card__inner">
+              <p class="tut-card__desc">
+                O <strong>Sistema @Reference</strong> é o diferencial do Seedance 2.0: permite combinar múltiplas fontes de referência em uma única geração para controle cinematográfico total.
+              </p>
+              <ul class="tut-card__list">
+                <li><strong>@Image:</strong> trava aparência de personagem — face, roupa e estilo visual. Carregue 3+ ângulos para consistência máxima</li>
+                <li><strong>@Video:</strong> transfere trajetórias de movimento e linguagem de câmera. Use para replicar coreografia ou trabalho de câmera específico</li>
+                <li><strong>@Audio:</strong> sincroniza diálogo com lip-sync nível fonema ou sincroniza cortes com batidas de música automaticamente</li>
+                <li>Combine @Image (personagem) + @Video (movimento) + @Audio (som) em uma única geração — o modelo mescla tudo de forma coerente</li>
+              </ul>
+              <div class="tut-card__tip"><strong>Dica:</strong> Não duplique instruções. Se usou @Video para câmera, não precisa descrever o mesmo movimento no prompt de texto.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 5. Timeline & Iteração -->
+        <div class="tut-card">
+          <div class="tut-card__header" role="button" tabindex="0" aria-expanded="false" onclick="toggleTut(this)">
+            <div class="tut-card__num tut-card__num--kobold">05</div>
+            <div class="tut-card__info">
+              <div class="tut-card__title">Timeline & Iteração</div>
+              <div class="tut-card__sub">beats · formato temporal · refinamento</div>
+            </div>
+            <span class="tut-card__chevron material-symbols-outlined">expand_more</span>
+          </div>
+          <div class="tut-card__body">
+            <div class="tut-card__inner">
+              <p class="tut-card__desc">O Seedance 2.0 suporta <strong>timeline prompting</strong> — marque o que deve acontecer em cada segundo. Formato: <code style="font-family:var(--font-mono);font-size:.8em;color:var(--brand-cloro)">0–Xs: [shot]. X+1–Ys: [shot].</code></p>
+              <table class="params-table">
+                <thead>
+                  <tr><th>Parâmetro</th><th>Recomendação</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td>Duração total</td><td>5s, 10s ou 15s — decida antes de escrever</td></tr>
+                  <tr><td>Beats</td><td><span class="params-table__rec">2–3 máximo</span> por geração</td></tr>
+                  <tr><td>Por beat</td><td>2–3 frases. Precisão &gt; comprimento</td></tr>
+                </tbody>
+              </table>
+              <ul class="tut-card__list" style="margin-top:var(--sp-4)">
+                <li>Gere 2–3 variações antes de mudar qualquer coisa — o modelo tem aleatoriedade natural</li>
+                <li>Visual errado? Adicione <strong>@Image</strong> antes de reescrever o prompt</li>
+                <li>Movimento errado? Adicione <strong>@Video</strong> em vez de descrever o movimento</li>
+                <li>Multi-shot inconsistente? Reduza para 2 beats e simplifique cada descrição</li>
+              </ul>
+              <div class="tut-card__tip"><strong>Regra:</strong> mude prompt OU referência OU beats — nunca os três ao mesmo tempo.</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════
+       CATEGORIAS
+       ═══════════════════════════════════════════ -->
+  <section id="categorias" class="sec hub-sec">
+    <div class="wrap">
+      <div class="sec-header">
+        <p class="eyebrow">Categorias</p>
+        <h2 class="t-lg">Prompts organizados por tipo</h2>
+        <p class="body-lg">
+          Cada categoria contém prompts validados e otimizados para as diferentes capacidades do Seedance 2.0.
+        </p>
+      </div>
+
+      <div class="hub-grid">
+        <a href="#tutorial" class="hub-card hub-card--kobold">
+          <div class="hub-card__icon"><span class="material-symbols-outlined">play_lesson</span></div>
+          <h3 class="hub-card__title">Tutorial</h3>
+          <p class="hub-card__desc">
+            Como usar o Seedance 2.0 do zero: plataforma, modos, @Reference, timeline prompting e iteração.
+          </p>
+          <div class="hub-card__arrow"><span class="material-symbols-outlined">arrow_forward</span></div>
+        </a>
+
+        <a href="#camera-movement" class="hub-card hub-card--teal">
+          <div class="hub-card__icon"><span class="material-symbols-outlined">videocam</span></div>
+          <h3 class="hub-card__title">Camera Movement</h3>
+          <p class="hub-card__desc">
+            Movimentos de câmera cinematográficos: dolly, pan, tilt, zoom e tracking shots.
+          </p>
+          <div class="hub-card__arrow"><span class="material-symbols-outlined">arrow_forward</span></div>
+        </a>
+
+        <a href="#multi-shot" class="hub-card hub-card--lime">
+          <div class="hub-card__icon"><span class="material-symbols-outlined">movie_filter</span></div>
+          <h3 class="hub-card__title">Multi-Shot & Timeline</h3>
+          <p class="hub-card__desc">
+            Sequências com múltiplos planos, cortes e timeline prompting — exclusivo do Seedance 2.0.
+          </p>
+          <div class="hub-card__arrow"><span class="material-symbols-outlined">arrow_forward</span></div>
+        </a>
+
+        <a href="#reference-system" class="hub-card hub-card--orange">
+          <div class="hub-card__icon"><span class="material-symbols-outlined">hub</span></div>
+          <h3 class="hub-card__title">Sistema @Reference</h3>
+          <p class="hub-card__desc">
+            @Audio (lip-sync, beat), @Video (motion transfer) e @Image (character lock) em produção.
+          </p>
+          <div class="hub-card__arrow"><span class="material-symbols-outlined">arrow_forward</span></div>
+        </a>
+
+        <a href="#reference-combos" class="hub-card hub-card--coral">
+          <div class="hub-card__icon"><span class="material-symbols-outlined">merge_type</span></div>
+          <h3 class="hub-card__title">@Reference Combos</h3>
+          <p class="hub-card__desc">
+            Stacking de referências: como combinar @Image, @Video e @Audio em uma única geração.
+          </p>
+          <div class="hub-card__arrow"><span class="material-symbols-outlined">arrow_forward</span></div>
+        </a>
+
+        <a href="#lighting" class="hub-card hub-card--amber">
+          <div class="hub-card__icon"><span class="material-symbols-outlined">wb_twilight</span></div>
+          <h3 class="hub-card__title">Lighting & Mood</h3>
+          <p class="hub-card__desc">
+            Controle de iluminação dinâmica, atmosfera e gradação de cor ao longo do vídeo.
+          </p>
+          <div class="hub-card__arrow"><span class="material-symbols-outlined">arrow_forward</span></div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════
+       CAMERA MOVEMENT
+       ═══════════════════════════════════════════ -->
+  <section id="camera-movement" class="sec">
+    <div class="wrap">
+      <div class="sec-header">
+        <p class="eyebrow">Camera Movement</p>
+        <h2 class="t-lg">Movimentos de Câmera</h2>
+        <p class="body-lg">
+          Prompts específicos para cada tipo de movimento cinematográfico no Seedance 2.0.
+        </p>
+      </div>
+
+      <div class="prompt-grid">
+        <!-- Dolly Push In -->
+        <div class="prompt-card">
+          <div class="prompt-card__header" onclick="togglePrompt(this)">
+            <div class="prompt-card__icon prompt-card__icon--1">
+              <span class="material-symbols-outlined">arrow_forward</span>
+            </div>
+            <div class="prompt-card__content">
+              <h3 class="prompt-card__title">Dolly Push In</h3>
+              <p class="prompt-card__subtitle">Aproximação suave em direção ao sujeito</p>
+            </div>
+            <span class="prompt-card__expand material-symbols-outlined">expand_more</span>
+          </div>
+          <div class="prompt-card__body">
+            <div class="prompt-card__inner">
+              <div class="prompt-code">
+                <div class="prompt-code__label">Prompt Base</div>
+                <button class="prompt-code__copy" onclick="copyPrompt(this)">Copiar</button>
+                <pre class="prompt-code__text">Cinematic dolly push in shot, smooth forward camera movement towards [subject], starting from wide establishing shot, gradually moving closer, maintaining sharp focus on [subject], stable gimbal movement, shallow depth of field, [lighting condition], cinematic color grade</pre>
+              </div>
+
+              <div class="prompt-code">
+                <div class="prompt-code__label">Exemplo Prático</div>
+                <button class="prompt-code__copy" onclick="copyPrompt(this)">Copiar</button>
+                <pre class="prompt-code__text">Cinematic dolly push in shot, smooth forward camera movement towards a woman sitting at a cafe table, starting from wide establishing shot showing the entire cafe interior, gradually moving closer to her face, maintaining sharp focus on her eyes, stable gimbal movement, shallow depth of field, warm golden hour lighting through windows, cinematic color grade</pre>
+              </div>
+
+              <div class="prompt-tips">
+                <div class="prompt-tips__title">
+                  <span class="material-symbols-outlined">tips_and_updates</span>
+                  Dicas de Uso
+                </div>
+                <ul>
+                  <li>Use "slow dolly" para movimento mais dramático e contemplativo</li>
+                  <li>Adicione "rack focus" para mudança de foco durante o movimento</li>
+                  <li>Especifique distância: "from 10ft to 3ft" para controle preciso</li>
+                  <li>Combine com @Image do personagem para manter consistência visual ao aproximar</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tracking Shot -->
+        <div class="prompt-card">
+          <div class="prompt-card__header" onclick="togglePrompt(this)">
+            <div class="prompt-card__icon prompt-card__icon--1">
+              <span class="material-symbols-outlined">video_camera_front</span>
+            </div>
+            <div class="prompt-card__content">
+              <h3 class="prompt-card__title">Tracking Shot</h3>
+              <p class="prompt-card__subtitle">Câmera seguindo o movimento do sujeito</p>
+            </div>
+            <span class="prompt-card__expand material-symbols-outlined">expand_more</span>
+          </div>
+          <div class="prompt-card__body">
+            <div class="prompt-card__inner">
+              <div class="prompt-code">
+                <div class="prompt-code__label">Prompt Base</div>
+                <button class="prompt-code__copy" onclick="copyPrompt(this)">Copiar</button>
+                <pre class="prompt-code__text">Smooth tracking shot following [subject] [direction], camera moves parallel maintaining consistent distance, professional steadicam movement, subject centered in frame, [environment] background, dynamic motion, cinematic composition, [lighting], sharp focus on subject</pre>
+              </div>
+
+              <div class="prompt-code">
+                <div class="prompt-code__label">Exemplo Prático</div>
+                <button class="prompt-code__copy" onclick="copyPrompt(this)">Copiar</button>
+                <pre class="prompt-code__text">Smooth tracking shot following a skateboarder moving left to right, camera moves parallel maintaining consistent distance of 6 feet, professional steadicam movement, skateboarder centered in frame, urban street background with motion blur, dynamic motion, cinematic composition, late afternoon golden light, sharp focus on skateboarder</pre>
+              </div>
+
+              <div class="prompt-tips">
+                <div class="prompt-tips__title">
+                  <span class="material-symbols-outlined">tips_and_updates</span>
+                  Dicas de Uso
+                </div>
+                <ul>
+                  <li>Especifique velocidade: "walking pace" ou "running speed" para movimento natural</li>
+                  <li>Para efeito dramático: "leading the subject" posiciona a câmera na frente</li>
+                  <li>Use "slight parallax" para adicionar profundidade ao background</li>
+                  <li>Combine com @Video de referência para replicar coreografia específica</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Orbit Shot -->
+        <div class="prompt-card">
+          <div class="prompt-card__header" onclick="togglePrompt(this)">
+            <div class="prompt-card__icon prompt-card__icon--1">
+              <span class="material-symbols-outlined">360</span>
+            </div>
+            <div class="prompt-card__content">
+              <h3 class="prompt-card__title">Orbit / 360° Shot</h3>
+              <p class="prompt-card__subtitle">Câmera girando ao redor do sujeito</p>
+            </div>
+            <span class="prompt-card__expand material-symbols-outlined">expand_more</span>
+          </div>
+          <div class="prompt-card__body">
+            <div class="prompt-card__inner">
+              <div class="prompt-code">
+                <div class="prompt-code__label">Prompt Base</div>
+                <button class="prompt-code__copy" onclick="copyPrompt(this)">Copiar</button>
+                <pre class="prompt-code__text">Circular orbit shot rotating around [subject], camera moves [clockwise/counter-clockwise] maintaining [distance], subject remains centered and in focus, smooth 360-degree rotation, professional gimbal movement, [background] visible in rotation, cinematic reveal, [lighting]</pre>
+              </div>
+
+              <div class="prompt-code">
+                <div class="prompt-code__label">Exemplo Prático</div>
+                <button class="prompt-code__copy" onclick="copyPrompt(this)">Copiar</button>
+                <pre class="prompt-code__text">Circular orbit shot rotating around a luxury watch on dark marble surface, camera moves clockwise maintaining 40cm distance, watch remains centered and in focus, smooth 360-degree rotation, professional gimbal movement, minimalist studio background visible in rotation, cinematic product reveal, dramatic edge lighting with golden rim highlights</pre>
+              </div>
+
+              <div class="prompt-tips">
+                <div class="prompt-tips__title">
+                  <span class="material-symbols-outlined">tips_and_updates</span>
+                  Dicas de Uso
+                </div>
+                <ul>
+                  <li>Use "slow orbit" para produtos, objetos e retratos — o Seedance 2.0 mantém textura excelente</li>
+                  <li>Adicione "slight dolly in while orbiting" para efeito dramático crescente</li>
+                  <li>Especifique ângulo: "180-degree orbit" para meia volta</li>
+                  <li>Para produtos: adicione @Image do produto para consistência visual perfeita</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════
+       MULTI-SHOT & TIMELINE
+       ═══════════════════════════════════════════ -->
+  <section id="multi-shot" class="sec sec--alt">
+    <div class="wrap">
+      <div class="sec-header">
+        <p class="eyebrow">Multi-Shot & Timeline</p>
+        <h2 class="t-lg">Sequências Cinematográficas</h2>
+        <p class="body-lg">
+          A feature exclusiva do Seedance 2.0: gere múltiplos planos com cortes em uma única geração de até 15 segundos.
+        </p>
+      </div>
+
+      <div class="prompt-grid">
+        <!-- Timeline Multi-Shot -->
+        <div class="prompt-card">
+          <div class="prompt-card__header" onclick="togglePrompt(this)">
+            <div class="prompt-card__icon prompt-card__icon--2">
+              <span class="material-symbols-outlined">timeline</span>
+            </div>
+            <div class="prompt-card__content">
+              <h3 class="prompt-card__title">Timeline Multi-Shot</h3>
+              <p class="prompt-card__subtitle">Controle preciso de beats temporais</p>
+            </div>
+            <span class="prompt-card__expand material-symbols-outlined">expand_more</span>
+          </div>
+          <div class="prompt-card__body">
+            <div class="prompt-card__inner">
+              <div class="prompt-code">
+                <div class="prompt-code__label">Estrutura Base</div>
+                <button class="prompt-code__copy" onclick="copyPrompt(this)">Copiar</button>
+                <pre class="prompt-code__text">0–[X]s: [Shot type], [subject] [action], [environment], [lighting].
+[X+1]–[Y]s: Cut to [shot type], [subject] [new action], [camera movement].
+[Y+1]–[Z]s: [Final shot type], [resolution action], [environment], camera [movement].</pre>
+              </div>
+
+              <div class="prompt-code">
+                <div class="prompt-code__label">Exemplo Prático (12s, 3 beats)</div>
+                <button class="prompt-code__copy" onclick="copyPrompt(this)">Copiar</button>
+                <pre class="prompt-code__text">0–4s: Close-up dolly push in on woman's face looking out window, soft morning light, contemplative expression.
+5–8s: Cut to medium shot, she stands and walks toward the door, camera tracks right following her movement.
+9–12s: Wide shot through the doorway, she steps into a bright sunlit kitchen, camera static, warm natural light.</pre>
+              </div>
+
+              <div class="prompt-tips">
+                <div class="prompt-tips__title">
+                  <span class="material-symbols-outlined">tips_and_updates</span>
+                  Dicas de Uso
+                </div>
+                <ul>
+                  <li>Decida a duração total (5s, 10s ou 15s) antes de escrever os beats</li>
+                  <li>Máximo 3 beats para 15s. Mais que isso fragmenta a coerência</li>
+                  <li>Mantenha personagem, iluminação e paleta de cores consistentes entre beats</li>
+                  <li>Escreva 2–3 frases por beat. Precisão importa mais que comprimento</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Story Beat Sequence -->
+        <div class="prompt-card">
+          <div class="prompt-card__header" onclick="togglePrompt(this)">
+            <div class="prompt-card__icon prompt-card__icon--2">
+              <span class="material-symbols-outlined">auto_stories</span>
+            </div>
+            <div class="prompt-card__content">
+              <h3 class="prompt-card__title">Story Beat Sequence</h3>
+              <p class="prompt-card__subtitle">Arco narrativo em uma única geração</p>
+            </div>
+            <span class="prompt-card__expand material-symbols-outlined">expand_more</span>
+          </div>
+          <div class="prompt-card__body">
+            <div class="prompt-card__inner">
+              <div class="prompt-code">
+                <div class="prompt-code__label">Prompt Base</div>
+                <button class="prompt-code__copy" onclick="copyPrompt(this)">Copiar</button>
+                <pre class="prompt-code__text">0–[X]s: Establishing wide shot, [location], [atmosphere], no character yet.
+[X+1]–[Y]s: Cut to [character] entering from [direction], [emotion] in body language, [shot type] following character.
+[Y+1]–[Z]s: Slow dolly push in to [character's face/detail], [emotion] intensifying, shallow depth of field, [lighting].</pre>
+              </div>
+
+              <div class="prompt-code">
+                <div class="prompt-code__label">Exemplo Prático</div>
+                <button class="prompt-code__copy" onclick="copyPrompt(this)">Copiar</button>
+                <pre class="prompt-code__text">0–3s: Wide establishing shot of empty rooftop at night, city lights below, cool blue ambient light, no character.
+4–8s: Cut to young man in dark jacket entering from left, slow walk toward railing, medium tracking shot, tense body language.
+9–13s: Slow dolly push in to his face looking at the city, subtle sadness in eyes, shallow depth of field, warm city glow backlighting.</pre>
+              </div>
+
+              <div class="prompt-tips">
+                <div class="prompt-tips__title">
+                  <span class="material-symbols-outlined">tips_and_updates</span>
+                  Dicas de Uso
+                </div>
+                <ul>
+                  <li>Descreva emoções do personagem explicitamente ("subtle sadness in eyes", "tense jaw")</li>
+                  <li>O beat de abertura sem personagem cria contexto — não pule</li>
+                  <li>Carregue @Image do personagem para manter consistência entre os beats</li>
+                  <li>O último beat em close-up com emoção é onde o Seedance 2.0 mais se destaca</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cut & Transition Multi-Shot -->
+        <div class="prompt-card">
+          <div class="prompt-card__header" onclick="togglePrompt(this)">
+            <div class="prompt-card__icon prompt-card__icon--2">
+              <span class="material-symbols-outlined">content_cut</span>
+            </div>
+            <div class="prompt-card__content">
+              <h3 class="prompt-card__title">Cut & Transition Multi-Shot</h3>
+              <p class="prompt-card__subtitle">Cortes dinâmicos com mudança de ritmo</p>
+            </div>
+            <span class="prompt-card__expand material-symbols-outlined">expand_more</span>
+          </div>
+          <div class="prompt-card__body">
+            <div class="prompt-card__inner">
+              <div class="prompt-code">
+                <div class="prompt-code__label">Prompt Base</div>
+                <button class="prompt-code__copy" onclick="copyPrompt(this)">Copiar</button>
+                <pre class="prompt-code__text">0–[X]s: [Fast/slow] [shot type], [subject] [action], [energy level], [lighting].
+[X+1]–[Y]s: Quick cut to [contrasting shot type], [subject] [contrasting action], [different energy], [lighting change].
+[Y+1]–[Z]s: [Final shot], [resolution of energy], [camera movement], [mood].</pre>
+              </div>
+
+              <div class="prompt-code">
+                <div class="prompt-code__label">Exemplo Prático (Ad de Produto)</div>
+                <button class="prompt-code__copy" onclick="copyPrompt(this)">Copiar</button>
+                <pre class="prompt-code__text">0–3s: Extreme close-up of hands opening a product package, fast handheld energy, dramatic side lighting.
+4–7s: Quick cut to medium shot of person's face reacting with genuine surprise and delight, warm natural light.
+8–12s: Wide clean product shot, object centered on minimal white surface, slow orbit camera movement, professional studio lighting.</pre>
+              </div>
+
+              <div class="prompt-tips">
+                <div class="prompt-tips__title">
+                  <span class="material-symbols-outlined">tips_and_updates</span>
+                  Dicas de Uso
+                </div>
+                <ul>
+                  <li>Contraste de ritmo entre beats cria energia — fast/slow, wide/close, dark/bright</li>
+                  <li>Especifique "quick cut" para cortes abruptos ou "smooth cut" para transições suaves</li>
+                  <li>Para ads: close-up de reação humana + produto clean no final funciona muito bem</li>
+                  <li>Adicione @Audio de música para sincronizar os cortes automaticamente com o ritmo</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Reveal Multi-Shot -->
+        <div class="prompt-card">
+          <div class="prompt-card__header" onclick="togglePrompt(this)">
+            <div class="prompt-card__icon prompt-card__icon--2">
+              <span class="material-symbols-outlined">visibility</span>
+            </div>
+            <div class="prompt-card__content">
+              <h3 class="prompt-card__title">Product Reveal Multi-Beat</h3>
+              <p class="prompt-card__subtitle">Revelar produto em três atos com câmeras distintas</p>
+            </div>
+            <span class="prompt-card__expand material-symbols-outlined">expand_more</span>
+          </div>
+          <div class="prompt-card__body">
+            <div class="prompt-card__inner">
+              <div class="prompt-code">
+                <div class="prompt-code__label">Estrutura Base</div>
+                <button class="prompt-code__copy" onclick="copyPrompt(this)">Copiar</button>
+                <pre class="prompt-code__text">0–[X]s: Macro close-up on [product detail], texture and material visible, static shot, dramatic side lighting.
+[X+1]–[Y]s: Cut to medium shot, [product] being [used/opened/worn] by hands, tracking the action.
+[Y+1]–[Z]s: Wide clean shot, [product] centered on [surface], slow orbit camera, professional studio lighting, full product visible.</pre>
+              </div>
+
+              <div class="prompt-code">
+                <div class="prompt-code__label">Exemplo Prático</div>
+                <button class="prompt-code__copy" onclick="copyPrompt(this)">Copiar</button>
+                <pre class="prompt-code__text">0–4s: Extreme close-up on leather watch strap texture, stitching and grain detail sharp, static macro shot, warm directional side lighting with deep shadows.
+5–9s: Cut to medium tracking shot, hands clasping watch onto wrist, camera follows the fastening motion, warm skin tone lighting.
+10–14s: Clean wide shot, watch on dark marble surface centered, slow 180-degree orbit camera movement, professional product studio lighting with rim highlights.</pre>
+              </div>
+
+              <div class="prompt-tips">
+                <div class="prompt-tips__title">
+                  <span class="material-symbols-outlined">tips_and_updates</span>
+                  Dicas de Uso
+                </div>
+                <ul>
+                  <li>A estrutura macro → uso → produto clean é a sequência mais eficiente para ads de produto</li>
+                  <li>Carregue @Image do produto para consistência visual entre os três beats</li>
+                  <li>O último beat estático com orbit funciona como shot de pack final — ideal para captura de frame</li>
+                  <li>Combine com @Audio de música para sincronizar o corte no momento da revelação</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Character Multi-Scene -->
+        <div class="prompt-card">
+          <div class="prompt-card__header" onclick="togglePrompt(this)">
+            <div class="prompt-card__icon prompt-card__icon--2">
+              <span class="material-symbols-outlined">face</span>
+            </div>
+            <div class="prompt-card__content">
+              <h3 class="prompt-card__title">Character Consistency Multi-Scene</h3>
+              <p class="prompt-card__subtitle">Mesmo personagem em múltiplos contextos</p>
+            </div>
+            <span class="prompt-card__expand material-symbols-outlined">expand_more</span>
+          </div>
+          <div class="prompt-card__body">
+            <div class="prompt-card__inner">
+              <div class="prompt-code">
+                <div class="prompt-code__label">Prompt Base</div>
+                <button class="prompt-code__copy" onclick="copyPrompt(this)">Copiar</button>
+                <pre class="prompt-code__text">[@Image character reference locked] 0–[X]s: [Shot], character in [environment A], [action], [lighting A].
+[X+1]–[Y]s: Cut to character in [environment B], [different action], [lighting B], same face and clothing.
+[Y+1]–[Z]s: Character in [environment C], [final action], [lighting C], consistent appearance throughout.</pre>
+              </div>
+
+              <div class="prompt-code">
+                <div class="prompt-code__label">Exemplo Prático</div>
+                <button class="prompt-code__copy" onclick="copyPrompt(this)">Copiar</button>
+                <pre class="prompt-code__text">0–4s: Medium shot, woman in red coat walking through misty morning forest, camera tracking beside her, cool blue light.
+5–9s: Cut to same woman entering a warm coffee shop, removing her coat, medium shot from behind counter, soft warm interior light.
+10–14s: Close-up of her face wrapping hands around a coffee cup, content expression, shallow depth of field, cozy bokeh background.</pre>
+              </div>
+
+              <div class="prompt-tips">
+                <div class="prompt-tips__title">
+                  <span class="material-symbols-outlined">tips_and_updates</span>
+                  Dicas de Uso
+                </div>
+                <ul>
+                  <li>Sempre carregue @Image do personagem — sem ela a consistência de face entre beats cai drasticamente</li>
+                  <li>Carregue 3+ ângulos do mesmo personagem para melhor resultado (frontal, 3/4 e perfil)</li>
+                  <li>Mantenha a roupa idêntica em todos os beats, a não ser que a mudança seja narrativa</li>
+                  <li>Descrição explícita da roupa no prompt ajuda: "woman in red coat" em todos os beats</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════
+       SISTEMA @REFERENCE
+       ═══════════════════════════════════════════ -->
+  <section id="reference-system" class="sec">
+    <div class="wrap">
+      <div class="sec-header">
+        <p class="eyebrow">Sistema @Reference</p>
+        <h2 class="t-lg">Referências Multimodais</h2>
+        <p class="body-lg">
+          O diferencial técnico do Seedance 2.0: combine @Image, @Video e @Audio em uma única geração para controle total.
+        </p>
+      </div>
+
+      <div class="prompt-grid">
+        <!-- @Audio Lip-Sync -->
+        <div class="prompt-card">
+          <div class="prompt-card__header" onclick="togglePrompt(this)">
+            <div class="prompt-card__icon prompt-card__icon--3">
+              <span class="material-symbols-outlined">record_voice_over</span>
+            </div>
+            <div class="prompt-card__content">
+              <h3 class="prompt-card__title">@Audio — Lip-Sync</h3>
+              <p class="prompt-card__subtitle">Sincronização labial nível fonema</p>
+            </div>
+            <span class="prompt-card__expand material-symbols-outlined">expand_more</span>
+          </div>
+          <div class="prompt-card__body">
+            <div class="prompt-card__inner">
+              <div class="prompt-code">
+                <div class="prompt-code__label">Prompt Base</div>
+                <button class="prompt-code__copy" onclick="copyPrompt(this)">Copiar</button>
+                <pre class="prompt-code__text">Front-facing [shot type], [subject] speaking [description], @Audio synchronized lip movement at phoneme level, natural facial expressions matching audio emotion, [background/environment], [lighting condition], [visual style]</pre>
+              </div>
+
+              <div class="prompt-code">
+                <div class="prompt-code__label">Exemplo Prático</div>
+                <button class="prompt-code__copy" onclick="copyPrompt(this)">Copiar</button>
+                <pre class="prompt-code__text">Front-facing medium shot, young woman looking directly at camera delivering a product testimonial, @Audio synchronized with precise phoneme-level lip movement, natural confident smile and hand gestures matching speech rhythm, minimal apartment background with soft window light, warm authentic vlog aesthetic, vertical 9:16 format</pre>
+              </div>
+
+              <div class="prompt-tips">
+                <div class="prompt-tips__title">
+                  <span class="material-symbols-outlined">tips_and_updates</span>
+                  Dicas de Uso
+                </div>
+                <ul>
+                  <li>O áudio deve ser limpo — sem ruído de fundo para melhor sincronização fonema a fonema</li>
+                  <li>Áudio de até 15s para melhor qualidade de sync</li>
+                  <li>Carregue @Image da pessoa junto com @Audio para consistência de face durante o lip-sync</li>
+                  <li>Especifique "looking directly at camera" para o efeito de fala direta ao espectador</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- @Audio Beat Sync -->
+        <div class="prompt-card">
+          <div class="prompt-card__header" onclick="togglePrompt(this)">
+            <div class="prompt-card__icon prompt-card__icon--3">
+              <span class="material-symbols-outlined">music_note</span>
+            </div>
+            <div class="prompt-card__content">
+              <h3 class="prompt-card__title">@Audio — Beat Sync</h3>
+              <p class="prompt-card__subtitle">Sincronização automática com ritmo musical</p>
+            </div>
+            <span class="prompt-card__expand material-symbols-outlined">expand_more</span>
+          </div>
+          <div class="prompt-card__body">
+            <div class="prompt-card__inner">
+              <div class="prompt-code">
+                <div class="prompt-code__label">Prompt Base</div>
+                <button class="prompt-code__copy" onclick="copyPrompt(this)">Copiar</button>
+                <pre class="prompt-code__text">@Audio [music description] driving the edit rhythm, [visual content], cuts and camera motion synchronized to music beats, [beat structure: slow/fast/varied], [number] distinct shots across [duration], [mood matching audio energy], [visual style]</pre>
+              </div>
+
+              <div class="prompt-code">
+                <div class="prompt-code__label">Exemplo Prático</div>
+                <button class="prompt-code__copy" onclick="copyPrompt(this)">Copiar</button>
+                <pre class="prompt-code__text">@Audio driving the edit rhythm with energetic electronic beats, fashion model in editorial shoot walking through different locations, cuts synchronized to music beats with camera motion changes on each beat drop, 3 distinct locations across 12 seconds, high-energy editorial mood matching the music intensity, cinematic color grade with bold saturated palette</pre>
+              </div>
+
+              <div class="prompt-tips">
+                <div class="prompt-tips__title">
+                  <span class="material-symbols-outlined">tips_and_updates</span>
+                  Dicas de Uso
+                </div>
+                <ul>
+                  <li>Carregar música com batida clara (EDM, hip-hop, pop) dá os melhores resultados</li>
+                  <li>Descreva a energia do áudio no prompt ("energetic", "melancholic", "cinematic") para alinhar o visual</li>
+                  <li>O modelo ajusta cortes e transições automaticamente — não precisa especificar cada corte</li>
+                  <li>Combine @Audio (música) + @Image (personagem) para UGC e Reels sincronizados</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- @Video Motion Transfer -->
+        <div class="prompt-card">
+          <div class="prompt-card__header" onclick="togglePrompt(this)">
+            <div class="prompt-card__icon prompt-card__icon--3">
+              <span class="material-symbols-outlined">swap_vert</span>
+            </div>
+            <div class="prompt-card__content">
+              <h3 class="prompt-card__title">@Video — Motion Transfer</h3>
+              <p class="prompt-card__subtitle">Transferência de movimento e câmera de referência</p>
+            </div>
+            <span class="prompt-card__expand material-symbols-outlined">expand_more</span>
+          </div>
+          <div class="prompt-card__body">
+            <div class="prompt-card__inner">
+              <div class="prompt-code">
+                <div class="prompt-code__label">Prompt Base</div>
+                <button class="prompt-code__copy" onclick="copyPrompt(this)">Copiar</button>
+                <pre class="prompt-code__text">[New subject] performing the same movement as @Video reference, motion trajectory transferred with same timing and energy, [new environment] instead of original, [lighting condition], [visual style], maintaining exact movement pattern from reference</pre>
+              </div>
+
+              <div class="prompt-code">
+                <div class="prompt-code__label">Exemplo Prático</div>
+                <button class="prompt-code__copy" onclick="copyPrompt(this)">Copiar</button>
+                <pre class="prompt-code__text">A woman in activewear performing the same dance choreography as @Video reference, motion trajectory transferred with identical timing and energy, modern dance studio environment with mirrored walls instead of original setting, dramatic side lighting with long shadows, editorial sports aesthetic, maintaining exact arm and body movement pattern from reference video</pre>
+              </div>
+
+              <div class="prompt-tips">
+                <div class="prompt-tips__title">
+                  <span class="material-symbols-outlined">tips_and_updates</span>
+                  Dicas de Uso
+                </div>
+                <ul>
+                  <li>Funciona para movimentos de corpo, dança, gestos e também para linguagem de câmera</li>
+                  <li>O @Video de câmera transfere dolly, pan e tracking — ideal para replicar câmera de ads de referência</li>
+                  <li>Carregue @Image do novo personagem junto com @Video para substituição limpa</li>
+                  <li>Vídeos de referência de 5–15s funcionam melhor. Referências muito longas perdem precisão</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- @Image Character Lock -->
+        <div class="prompt-card">
+          <div class="prompt-card__header" onclick="togglePrompt(this)">
+            <div class="prompt-card__icon prompt-card__icon--3">
+              <span class="material-symbols-outlined">lock</span>
+            </div>
+            <div class="prompt-card__content">
+              <h3 class="prompt-card__title">@Image — Character Lock</h3>
+              <p class="prompt-card__subtitle">Consistência absoluta de personagem entre cenas</p>
+            </div>
+            <span class="prompt-card__expand material-symbols-outlined">expand_more</span>
+          </div>
+          <div class="prompt-card__body">
+            <div class="prompt-card__inner">
+              <div class="prompt-code">
+                <div class="prompt-code__label">Prompt Base</div>
+                <button class="prompt-code__copy" onclick="copyPrompt(this)">Copiar</button>
+                <pre class="prompt-code__text">@Image [character description matching reference], [shot type], [character] [action], [environment], [lighting], character face and clothing matching @Image reference exactly, [visual style]</pre>
+              </div>
+
+              <div class="prompt-code">
+                <div class="prompt-code__label">Exemplo Prático</div>
+                <button class="prompt-code__copy" onclick="copyPrompt(this)">Copiar</button>
+                <pre class="prompt-code__text">@Image woman with short dark hair in white blazer, medium tracking shot, she walks confidently through a bright modern office corridor, fluorescent ceiling lights with window light on the right, character face and expression matching @Image reference exactly, professional corporate aesthetic, slight motion blur on background</pre>
+              </div>
+
+              <div class="prompt-tips">
+                <div class="prompt-tips__title">
+                  <span class="material-symbols-outlined">tips_and_updates</span>
+                  Dicas de Uso
+                </div>
+                <ul>
+                  <li>Carregue mínimo 3 imagens do personagem (frontal, 3/4 esquerda, 3/4 direita)</li>
+                  <li>Mantenha iluminação similar entre as fotos de referência para melhor lock de aparência</li>
+                  <li>Descreva o personagem no prompt exatamente como aparece no @Image — reforça o lock</li>
+                  <li>Para séries de conteúdo: salve o conjunto de @Images como template reutilizável</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════
+       @REFERENCE COMBOS
+       ═══════════════════════════════════════════ -->
+  <section id="reference-combos" class="sec sec--alt">
+    <div class="wrap">
+      <div class="sec-header">
+        <p class="eyebrow">@Reference Combos</p>
+        <h2 class="t-lg">Stacking de Referências</h2>
+        <p class="body-lg">
+          A real vantagem do Seedance 2.0 está em combinar tipos de referência numa única geração. Aqui estão as combinações que mais funcionam.
+        </p>
+      </div>
+
+      <div class="prompt-grid">
+        <!-- @Image + @Audio -->
+        <div class="prompt-card">
+          <div class="prompt-card__header" onclick="togglePrompt(this)">
+            <div class="prompt-card__icon prompt-card__icon--5">
+              <span class="material-symbols-outlined">face_retouching_natural</span>
+            </div>
+            <div class="prompt-card__content">
+              <h3 class="prompt-card__title">@Image + @Audio — UGC Stack</h3>
+              <p class="prompt-card__subtitle">Trava face e sincroniza voz na mesma geração</p>
+            </div>
+            <span class="prompt-card__expand material-symbols-outlined">expand_more</span>
+          </div>
+          <div class="prompt-card__body">
+            <div class="prompt-card__inner">
+              <div class="prompt-code">
+                <div class="prompt-code__label">Prompt Base</div>
+                <button class="prompt-code__copy" onclick="copyPrompt(this)">Copiar</button>
+                <pre class="prompt-code__text">@Image [character description matching reference], front-facing medium shot, [character] looking directly at camera, @Audio synchronized lip movement, natural speech expressions and hand gestures, [background], [lighting], authentic [vlog/testimonial/tutorial] aesthetic, [aspect ratio]</pre>
+              </div>
+
+              <div class="prompt-code">
+                <div class="prompt-code__label">Exemplo Prático</div>
+                <button class="prompt-code__copy" onclick="copyPrompt(this)">Copiar</button>
+                <pre class="prompt-code__text">@Image young woman with curly hair in denim jacket, front-facing medium shot, she looks directly at camera reviewing a skincare product, @Audio synchronized phoneme-level lip movement, confident expressions and occasional hand gestures holding product, bright minimal bedroom background with ring-light catchlight, natural daylight color temperature, authentic UGC testimonial aesthetic, vertical 9:16 format</pre>
+              </div>
+
+              <div class="prompt-tips">
+                <div class="prompt-tips__title">
+                  <span class="material-symbols-outlined">tips_and_updates</span>
+                  Dicas de Uso
+                </div>
+                <ul>
+                  <li>Carregue foto frontal obrigatoriamente — o modelo precisa do ângulo de fala para o lip-sync</li>
+                  <li>Áudio limpo sem eco ou ruído de fundo garante sincronização fonema a fonema</li>
+                  <li>Não repita no prompt o que @Audio já instrui — "speaking" é suficiente, não descreva o discurso</li>
+                  <li>Esta combinação é a base de todo workflow UGC e depoimento no Seedance 2.0</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- @Video + @Image -->
+        <div class="prompt-card">
+          <div class="prompt-card__header" onclick="togglePrompt(this)">
+            <div class="prompt-card__icon prompt-card__icon--5">
+              <span class="material-symbols-outlined">switch_video</span>
+            </div>
+            <div class="prompt-card__content">
+              <h3 class="prompt-card__title">@Video + @Image — Motion Swap</h3>
+              <p class="prompt-card__subtitle">Transfere movimento de referência para novo personagem</p>
+            </div>
+            <span class="prompt-card__expand material-symbols-outlined">expand_more</span>
+          </div>
+          <div class="prompt-card__body">
+            <div class="prompt-card__inner">
+              <div class="prompt-code">
+                <div class="prompt-code__label">Prompt Base</div>
+                <button class="prompt-code__copy" onclick="copyPrompt(this)">Copiar</button>
+                <pre class="prompt-code__text">@Image [new character description], performing the same movement as @Video reference with identical timing and energy, [new environment] replacing original setting, [lighting], same motion trajectory from reference, character face and body matching @Image exactly, [visual style]</pre>
+              </div>
+
+              <div class="prompt-code">
+                <div class="prompt-code__label">Exemplo Prático (Campanha de Moda)</div>
+                <button class="prompt-code__copy" onclick="copyPrompt(this)">Copiar</button>
+                <pre class="prompt-code__text">@Image model with short blond hair in structured blazer, performing the same confident catwalk strut as @Video reference with identical rhythm and weight transfer, modern glass-facade building exterior replacing studio setting, dramatic overcast daylight with subtle fill, same stride pattern and arm swing from reference video, model face and outfit matching @Image exactly, high-fashion editorial aesthetic</pre>
+              </div>
+
+              <div class="prompt-tips">
+                <div class="prompt-tips__title">
+                  <span class="material-symbols-outlined">tips_and_updates</span>
+                  Dicas de Uso
+                </div>
+                <ul>
+                  <li>Use para replicar coreografia de um vídeo de referência com seu próprio personagem ou modelo</li>
+                  <li>O @Video instrui câmera E corpo — não descreva o movimento em texto, deixe o @Video fazer isso</li>
+                  <li>Funciona bem com referências de dança, esporte, catwalk e movimentos de câmera específicos</li>
+                  <li>Quanto mais similar o tipo de cena (interiores/exteriores), melhor a transferência</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- @Video + @Audio -->
+        <div class="prompt-card">
+          <div class="prompt-card__header" onclick="togglePrompt(this)">
+            <div class="prompt-card__icon prompt-card__icon--5">
+              <span class="material-symbols-outlined">queue_music</span>
+            </div>
+            <div class="prompt-card__content">
+              <h3 class="prompt-card__title">@Video + @Audio — Rhythm & Camera</h3>
+              <p class="prompt-card__subtitle">Câmera de referência sincronizada com batida</p>
+            </div>
+            <span class="prompt-card__expand material-symbols-outlined">expand_more</span>
+          </div>
+          <div class="prompt-card__body">
+            <div class="prompt-card__inner">
+              <div class="prompt-code">
+                <div class="prompt-code__label">Prompt Base</div>
+                <button class="prompt-code__copy" onclick="copyPrompt(this)">Copiar</button>
+                <pre class="prompt-code__text">@Audio [music energy] driving the edit rhythm, @Video camera movement style as reference, [subject/scene], cuts and camera transitions synchronized to music beats, [number] shots across [duration], [mood matching audio energy], [visual style]</pre>
+              </div>
+
+              <div class="prompt-code">
+                <div class="prompt-code__label">Exemplo Prático</div>
+                <button class="prompt-code__copy" onclick="copyPrompt(this)">Copiar</button>
+                <pre class="prompt-code__text">@Audio with driving hip-hop beat controlling cut timing, @Video handheld documentary camera style as reference, street basketball player performing tricks in urban court, cuts hitting each bar of the beat with camera angle changes, 4 distinct angles across 12 seconds, high-energy street sports mood matching percussive audio, cinematic grade with boosted contrast and warm shadows</pre>
+              </div>
+
+              <div class="prompt-tips">
+                <div class="prompt-tips__title">
+                  <span class="material-symbols-outlined">tips_and_updates</span>
+                  Dicas de Uso
+                </div>
+                <ul>
+                  <li>Use quando quiser que o estilo de câmera venha de um vídeo de referência E o ritmo do áudio</li>
+                  <li>Músicas com batida clara (hip-hop, EDM, trap) geram melhores resultados de sync</li>
+                  <li>O modelo decide os ângulos — você define quantos shots e a energia geral no prompt</li>
+                  <li>Ideal para reels de esporte, fitness e moda onde câmera e música são igualmente importantes</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Triple Stack -->
+        <div class="prompt-card">
+          <div class="prompt-card__header" onclick="togglePrompt(this)">
+            <div class="prompt-card__icon prompt-card__icon--5">
+              <span class="material-symbols-outlined">stacks</span>
+            </div>
+            <div class="prompt-card__content">
+              <h3 class="prompt-card__title">Triple Stack — @Image + @Video + @Audio</h3>
+              <p class="prompt-card__subtitle">O combo máximo: personagem + movimento + som</p>
+            </div>
+            <span class="prompt-card__expand material-symbols-outlined">expand_more</span>
+          </div>
+          <div class="prompt-card__body">
+            <div class="prompt-card__inner">
+              <div class="prompt-code">
+                <div class="prompt-code__label">Prompt Base</div>
+                <button class="prompt-code__copy" onclick="copyPrompt(this)">Copiar</button>
+                <pre class="prompt-code__text">@Image [character] with face and appearance locked, @Video camera movement and blocking as reference, @Audio synchronized [dialogue/music] driving timing, [minimal scene description], [environment], [lighting] — let references guide the majority of the output</pre>
+              </div>
+
+              <div class="prompt-code">
+                <div class="prompt-code__label">Exemplo Prático (Ad de Marca)</div>
+                <button class="prompt-code__copy" onclick="copyPrompt(this)">Copiar</button>
+                <pre class="prompt-code__text">@Image brand ambassador with short natural hair and white athletic gear locked in appearance, @Video premium sportswear ad camera movement as reference, @Audio voiceover synchronized with lip movement driving the pacing, medium shot transitioning to close-up, modern urban gym environment, high-contrast athletic lighting with strong key from above — let the three references drive camera, timing, and performance</pre>
+              </div>
+
+              <div class="prompt-tips">
+                <div class="prompt-tips__title">
+                  <span class="material-symbols-outlined">tips_and_updates</span>
+                  Dicas de Uso
+                </div>
+                <ul>
+                  <li>Com 3 referências ativas, <strong>escreva menos no prompt de texto</strong> — as referências já dão a maioria das instruções</li>
+                  <li>Conflito entre referências gera resultados imprevisíveis — certifique-se que @Video e @Audio têm ritmos compatíveis</li>
+                  <li>Esta combinação é para produção avançada — domine cada referência individualmente antes de stackar</li>
+                  <li>Se o resultado ficar confuso, remova uma referência por vez para identificar qual está causando conflito</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════
+       LIGHTING & MOOD
+       ═══════════════════════════════════════════ -->
+  <section id="lighting" class="sec">
+    <div class="wrap">
+      <div class="sec-header">
+        <p class="eyebrow">Lighting & Mood</p>
+        <h2 class="t-lg">Iluminação Dinâmica</h2>
+        <p class="body-lg">
+          Controle de luz, atmosfera e gradação de cor ao longo do shot.
+        </p>
+      </div>
+
+      <div class="prompt-grid">
+        <!-- Dynamic Lighting Change -->
+        <div class="prompt-card">
+          <div class="prompt-card__header" onclick="togglePrompt(this)">
+            <div class="prompt-card__icon prompt-card__icon--4">
+              <span class="material-symbols-outlined">light_mode</span>
+            </div>
+            <div class="prompt-card__content">
+              <h3 class="prompt-card__title">Dynamic Lighting Change</h3>
+              <p class="prompt-card__subtitle">Mudança gradual de iluminação no mesmo shot</p>
+            </div>
+            <span class="prompt-card__expand material-symbols-outlined">expand_more</span>
+          </div>
+          <div class="prompt-card__body">
+            <div class="prompt-card__inner">
+              <div class="prompt-code">
+                <div class="prompt-code__label">Prompt Base</div>
+                <button class="prompt-code__copy" onclick="copyPrompt(this)">Copiar</button>
+                <pre class="prompt-code__text">[Scene/subject] with lighting transition from [lighting state A] to [lighting state B], smooth gradual change, realistic light behavior, [time of day/source change], natural color temperature shift, shadows moving accordingly, atmospheric adjustment, cinematic mood evolution</pre>
+              </div>
+
+              <div class="prompt-code">
+                <div class="prompt-code__label">Exemplo Prático</div>
+                <button class="prompt-code__copy" onclick="copyPrompt(this)">Copiar</button>
+                <pre class="prompt-code__text">Woman reading by window with lighting transition from bright daylight to warm sunset glow, smooth gradual change over 5 seconds, realistic light behavior through curtains, afternoon sun to golden hour, natural color temperature shift from cool to warm orange, shadows lengthening and softening, atmospheric dust particles visible in light beams, cinematic mood evolution from energetic to contemplative</pre>
+              </div>
+
+              <div class="prompt-tips">
+                <div class="prompt-tips__title">
+                  <span class="material-symbols-outlined">tips_and_updates</span>
+                  Dicas de Uso
+                </div>
+                <ul>
+                  <li>Especifique duração da transição para controle preciso ("over 5 seconds")</li>
+                  <li>Mencione temperatura de cor para realismo ("from cool 5600K to warm 3200K")</li>
+                  <li>Adicione comportamento de sombras para profundidade visual</li>
+                  <li>Em multi-shot, use lighting change entre beats para indicar passagem de tempo</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dramatic Spotlight -->
+        <div class="prompt-card">
+          <div class="prompt-card__header" onclick="togglePrompt(this)">
+            <div class="prompt-card__icon prompt-card__icon--4">
+              <span class="material-symbols-outlined">wb_incandescent</span>
+            </div>
+            <div class="prompt-card__content">
+              <h3 class="prompt-card__title">Dramatic Spotlight</h3>
+              <p class="prompt-card__subtitle">Iluminação focal com alto contraste</p>
+            </div>
+            <span class="prompt-card__expand material-symbols-outlined">expand_more</span>
+          </div>
+          <div class="prompt-card__body">
+            <div class="prompt-card__inner">
+              <div class="prompt-code">
+                <div class="prompt-code__label">Prompt Base</div>
+                <button class="prompt-code__copy" onclick="copyPrompt(this)">Copiar</button>
+                <pre class="prompt-code__text">[Subject] illuminated by [spotlight type], strong contrast between lit area and deep shadow, [falloff type: sharp/soft] light edge, dramatic chiaroscuro effect, [fill light level: none/minimal/subtle], [background treatment: black/dark/environmental], professional theatrical lighting, [color temperature]</pre>
+              </div>
+
+              <div class="prompt-code">
+                <div class="prompt-code__label">Exemplo Prático</div>
+                <button class="prompt-code__copy" onclick="copyPrompt(this)">Copiar</button>
+                <pre class="prompt-code__text">Jazz musician playing saxophone illuminated by single overhead spotlight, strong contrast between lit performer and deep surrounding shadow, sharp circular falloff at spotlight edge, dramatic chiaroscuro with shadow side completely dark, no fill light for maximum theatrical drama, pure black background disappearing into darkness, professional theatrical lighting setup at 45-degree front angle, warm tungsten 3200K with golden highlights gleaming on brass saxophone</pre>
+              </div>
+
+              <div class="prompt-tips">
+                <div class="prompt-tips__title">
+                  <span class="material-symbols-outlined">tips_and_updates</span>
+                  Dicas de Uso
+                </div>
+                <ul>
+                  <li>Especifique ângulo: "45-degree front key", "top-down overhead", "side lighting"</li>
+                  <li>"Hard falloff" = borda nítida. "Soft falloff" = gradiente suave e mais elegante</li>
+                  <li>Para drama máximo: "no fill, maximum shadow" — o Seedance 2.0 renderiza chiaroscuro excelente</li>
+                  <li>Materiais reflexivos (metal, pele molhada, vidro) amplificam o impacto do spotlight</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Atmospheric Fog -->
+        <div class="prompt-card">
+          <div class="prompt-card__header" onclick="togglePrompt(this)">
+            <div class="prompt-card__icon prompt-card__icon--4">
+              <span class="material-symbols-outlined">foggy</span>
+            </div>
+            <div class="prompt-card__content">
+              <h3 class="prompt-card__title">Atmospheric Fog</h3>
+              <p class="prompt-card__subtitle">Névoa, haze e luz volumétrica</p>
+            </div>
+            <span class="prompt-card__expand material-symbols-outlined">expand_more</span>
+          </div>
+          <div class="prompt-card__body">
+            <div class="prompt-card__inner">
+              <div class="prompt-code">
+                <div class="prompt-code__label">Prompt Base</div>
+                <button class="prompt-code__copy" onclick="copyPrompt(this)">Copiar</button>
+                <pre class="prompt-code__text">[Scene] with [fog/mist/haze type], volumetric atmosphere, [density] fog distribution, [light source] creating visible god rays through atmosphere, atmospheric depth layers fading into distance, [near/far] visibility gradient, [mood/time of day descriptor]</pre>
+              </div>
+
+              <div class="prompt-code">
+                <div class="prompt-code__label">Exemplo Prático</div>
+                <button class="prompt-code__copy" onclick="copyPrompt(this)">Copiar</button>
+                <pre class="prompt-code__text">Ancient forest path at dawn with dense morning mist, volumetric atmosphere with tangible depth, thick fog pooling low at ground level thinning upward, early sunrise rays piercing through tree canopy creating dramatic golden god rays visible in mist, atmospheric depth with nearest trees sharp and distant trees barely silhouettes, cool blue-gray dawn tones contrasting with warm golden sunrise rays, mysterious and contemplative morning mood</pre>
+              </div>
+
+              <div class="prompt-tips">
+                <div class="prompt-tips__title">
+                  <span class="material-symbols-outlined">tips_and_updates</span>
+                  Dicas de Uso
+                </div>
+                <ul>
+                  <li>"God rays" ou "crepuscular rays" para raios de luz visíveis no nevoeiro</li>
+                  <li>Especifique altura da névoa: "ground-level fog", "mid-height haze"</li>
+                  <li>O Seedance 2.0 renderiza física de névoa muito bem — combine com backlight para efeito épico</li>
+                  <li>Para cenas urbanas: "industrial haze" e "sodium vapor light god rays"</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Neon Color Wash -->
+        <div class="prompt-card">
+          <div class="prompt-card__header" onclick="togglePrompt(this)">
+            <div class="prompt-card__icon prompt-card__icon--4">
+              <span class="material-symbols-outlined">palette</span>
+            </div>
+            <div class="prompt-card__content">
+              <h3 class="prompt-card__title">Neon Color Wash</h3>
+              <p class="prompt-card__subtitle">Iluminação colorida e gradientes dramáticos</p>
+            </div>
+            <span class="prompt-card__expand material-symbols-outlined">expand_more</span>
+          </div>
+          <div class="prompt-card__body">
+            <div class="prompt-card__inner">
+              <div class="prompt-code">
+                <div class="prompt-code__label">Prompt Base</div>
+                <button class="prompt-code__copy" onclick="copyPrompt(this)">Copiar</button>
+                <pre class="prompt-code__text">[Subject/scene] bathed in [primary color] neon lighting, [primary color] dominant glow from [source], contrasting [secondary color] fill from [secondary source], dramatic color temperature clash, wet or reflective surface enhancing color, [aesthetic: cyberpunk/noir/editorial], atmospheric color grading, [environment]</pre>
+              </div>
+
+              <div class="prompt-code">
+                <div class="prompt-code__label">Exemplo Prático</div>
+                <button class="prompt-code__copy" onclick="copyPrompt(this)">Copiar</button>
+                <pre class="prompt-code__text">Woman standing in rain-soaked urban alley bathed in deep magenta neon lighting, vibrant magenta dominant glow from overhead neon sign reflecting on wet surfaces, contrasting cyan-blue fill from distant LED street fixtures, dramatic warm-to-cool color temperature clash creating split lighting on face, rain puddles reflecting fractured magenta and cyan patterns, cyberpunk aesthetic with rain streaks catching colored light, deep atmospheric color grading with rich shadows</pre>
+              </div>
+
+              <div class="prompt-tips">
+                <div class="prompt-tips__title">
+                  <span class="material-symbols-outlined">tips_and_updates</span>
+                  Dicas de Uso
+                </div>
+                <ul>
+                  <li>Contraste de cores opostas (magenta + ciano, laranja + azul) cria drama máximo</li>
+                  <li>Superfícies molhadas multiplicam o impacto — adicione "wet" ou "rain-soaked"</li>
+                  <li>Especifique a fonte: "neon sign", "LED strip", "gel-filtered key light"</li>
+                  <li>Pele humana responde excelente a color wash no Seedance 2.0 — ótimo para retratos e UGC</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════
+       WORKFLOWS
+       ═══════════════════════════════════════════ -->
+  <section id="workflows" class="sec">
+    <div class="wrap">
+      <div class="sec-header">
+        <p class="eyebrow">Workflows</p>
+        <h2 class="t-lg">Processos validados</h2>
+        <p class="body-lg">
+          Workflows completos testados para diferentes tipos de produção no Seedance 2.0.
+        </p>
+      </div>
+
+      <div class="workflow-grid">
+        <div class="workflow-card">
+          <div class="workflow-card__number">1</div>
+          <h3 class="workflow-card__title">Ad Multi-Reference</h3>
+          <ol class="workflow-card__steps">
+            <li class="workflow-card__step">
+              <span class="workflow-card__step-num">01</span>
+              <span><strong style="color:var(--foreground)">Template Research:</strong> Encontre ads de sucesso no seu nicho. Salve o melhor como <strong>@Video</strong> — o Seedance vai replicar câmera e ritmo</span>
+            </li>
+            <li class="workflow-card__step">
+              <span class="workflow-card__step-num">02</span>
+              <span><strong style="color:var(--foreground)">Brand Lock:</strong> Carregue 3–5 fotos do produto em ângulos diferentes como <strong>@Image</strong>. Isso trava a aparência visual em todos os frames</span>
+            </li>
+            <li class="workflow-card__step">
+              <span class="workflow-card__step-num">03</span>
+              <span><strong style="color:var(--foreground)">Audio First:</strong> Grave um voiceover ou escolha uma música. Carregue como <strong>@Audio</strong> — o modelo sincroniza cortes com batidas automaticamente</span>
+            </li>
+            <li class="workflow-card__step">
+              <span class="workflow-card__step-num">04</span>
+              <span><strong style="color:var(--foreground)">Prompt Estruturado:</strong> "Wide shot, [product] on [surface], [action], [lighting], [style]" seguindo [Camera] + [Subject] + [Action] + [Environment] + [Lighting] + [Style]</span>
+            </li>
+            <li class="workflow-card__step">
+              <span class="workflow-card__step-num">05</span>
+              <span><strong style="color:var(--foreground)">Iterate:</strong> Ajuste apenas 1 elemento por vez — @Video OU @Image OU prompt. Não os três juntos. A taxa de sucesso 90%+ garante resultado na 2ª ou 3ª variação</span>
+            </li>
+          </ol>
+          <div class="workflow-card__tip">
+            <strong>Dica Seedance:</strong> Você pode combinar os 3 tipos de @Reference em uma única geração. @Video para câmera + @Image para produto + @Audio para ritmo = controle cinematográfico total em um único clique.
+          </div>
+        </div>
+
+        <div class="workflow-card">
+          <div class="workflow-card__number">2</div>
+          <h3 class="workflow-card__title">Multi-Shot Narrativa</h3>
+          <ol class="workflow-card__steps">
+            <li class="workflow-card__step">
+              <span class="workflow-card__step-num">01</span>
+              <span><strong style="color:var(--foreground)">Storyboard em Texto:</strong> Escreva 2–3 beats descrevendo o arco narrativo antes de qualquer referência. Decida a duração total (10s ou 15s)</span>
+            </li>
+            <li class="workflow-card__step">
+              <span class="workflow-card__step-num">02</span>
+              <span><strong style="color:var(--foreground)">Character Lock:</strong> Carregue 3+ fotos do personagem principal (frontal, 3/4, perfil) como <strong>@Image</strong> para consistência entre beats</span>
+            </li>
+            <li class="workflow-card__step">
+              <span class="workflow-card__step-num">03</span>
+              <span><strong style="color:var(--foreground)">Timeline Prompt:</strong> Formate como "0–Xs: [beat 1]. X+1–Ys: [beat 2]. Y+1–Zs: [beat 3]" com tipo de plano, ação e iluminação em cada beat</span>
+            </li>
+            <li class="workflow-card__step">
+              <span class="workflow-card__step-num">04</span>
+              <span><strong style="color:var(--foreground)">Audio Sync (opcional):</strong> Carregue diálogo ou música ambiente como <strong>@Audio</strong>. O modelo sincroniza lip-sync ou batidas automaticamente</span>
+            </li>
+            <li class="workflow-card__step">
+              <span class="workflow-card__step-num">05</span>
+              <span><strong style="color:var(--foreground)">Iterate por Beat:</strong> Se um beat não ficou certo, ajuste apenas aquele beat no prompt. Não reescreva tudo</span>
+            </li>
+          </ol>
+          <div class="workflow-card__tip">
+            <strong>Dica Seedance:</strong> Máximo 3 beats para 15s. Mais que isso fragmenta a coerência do personagem entre cenas. Se precisar de mais cenas, gere duas sequências de 15s e monte na edição.
+          </div>
+        </div>
+
+        <div class="workflow-card">
+          <div class="workflow-card__number">3</div>
+          <h3 class="workflow-card__title">UGC & Lip-Sync</h3>
+          <ol class="workflow-card__steps">
+            <li class="workflow-card__step">
+              <span class="workflow-card__step-num">01</span>
+              <span><strong style="color:var(--foreground)">Person Reference:</strong> Carregue 2–3 fotos do apresentador ou personagem como <strong>@Image</strong>. Inclua ângulo frontal obrigatoriamente</span>
+            </li>
+            <li class="workflow-card__step">
+              <span class="workflow-card__step-num">02</span>
+              <span><strong style="color:var(--foreground)">Audio Upload:</strong> Grave um áudio limpo, sem ruído de fundo. Carregue como <strong>@Audio</strong>. O Seedance 2.0 faz lip-sync em nível de fonema automaticamente</span>
+            </li>
+            <li class="workflow-card__step">
+              <span class="workflow-card__step-num">03</span>
+              <span><strong style="color:var(--foreground)">Front-Facing Prompt:</strong> "Front-facing medium shot, [person] looking directly at camera, speaking naturally, [background], [lighting], authentic vlog aesthetic"</span>
+            </li>
+            <li class="workflow-card__step">
+              <span class="workflow-card__step-num">04</span>
+              <span><strong style="color:var(--foreground)">Formato Vertical:</strong> Especifique "vertical 9:16 format" no prompt. Ative o aspect ratio 9:16 nas configurações da plataforma</span>
+            </li>
+            <li class="workflow-card__step">
+              <span class="workflow-card__step-num">05</span>
+              <span><strong style="color:var(--foreground)">Music Layer:</strong> Opcionalmente adicione trilha como segundo @Audio. O modelo aplica beat sync sem perder o lip-sync do diálogo</span>
+            </li>
+          </ol>
+          <div class="workflow-card__tip">
+            <strong>Dica Seedance:</strong> Para lip-sync perfeito, use áudio com fala clara sem ruído de fundo e sem eco. Grave em ambiente silencioso. A qualidade do áudio impacta diretamente a precisão dos movimentos labiais.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════
+       FOOTER
+       ═══════════════════════════════════════════ -->
+  <footer class="footer">
+    <div class="wrap">
+      <div class="footer__inner">
+        <a href="#inicio" class="footer__logo" aria-label="Overlens">
+          <svg style="--fill-0:var(--neutral-white);" preserveAspectRatio="xMidYMid meet" viewBox="0 0 264 34" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Overlens">
+<path d="M17.1415 34C14.7474 34 12.513 33.5593 10.4381 32.6778C8.36326 31.7963 6.54377 30.5843 4.97965 29.0417C3.41553 27.4676 2.18658 25.6574 1.29279 23.6111C0.430931 21.5333 0 19.3139 0 16.9528C0 14.5917 0.430931 12.388 1.29279 10.3417C2.18658 8.29537 3.39957 6.50093 4.93177 4.95833C6.49589 3.38426 8.29942 2.17222 10.3423 1.32222C12.4172 0.440741 14.6517 0 17.0457 0C19.4398 0 21.6583 0.440741 23.7012 1.32222C25.7761 2.17222 27.5956 3.38426 29.1597 4.95833C30.7238 6.50093 31.9368 8.31111 32.7987 10.3889C33.6924 12.4352 34.1393 14.6389 34.1393 17C34.1393 19.3611 33.6924 21.5806 32.7987 23.6583C31.9368 25.7046 30.7238 27.4991 29.1597 29.0417C27.6275 30.5843 25.824 31.7963 23.7491 32.6778C21.7062 33.5593 19.5036 34 17.1415 34ZM17.0457 28.8056C19.3121 28.8056 21.2912 28.3019 22.983 27.2944C24.7067 26.287 26.0474 24.9019 27.005 23.1389C27.9946 21.3444 28.4893 19.2824 28.4893 16.9528C28.4893 15.2213 28.2021 13.6472 27.6275 12.2306C27.0848 10.7824 26.3028 9.53889 25.2813 8.5C24.2598 7.42963 23.0468 6.61111 21.6423 6.04445C20.2697 5.47778 18.7375 5.19444 17.0457 5.19444C14.8113 5.19444 12.8322 5.69815 11.1085 6.70556C9.41665 7.68148 8.07597 9.05093 7.08642 10.8139C6.1288 12.5769 5.64999 14.6231 5.64999 16.9528C5.64999 18.6843 5.92131 20.2898 6.46397 21.7694C7.03854 23.2176 7.8206 24.4611 8.81015 25.5C9.83162 26.5389 11.0446 27.3574 12.4491 27.9556C13.8536 28.5222 15.3858 28.8056 17.0457 28.8056Z" fill="var(--fill-0, black)"/>
+<path d="M226.573 34C223.924 34 221.673 33.5278 219.822 32.5833C217.97 31.6389 216.31 30.2537 214.842 28.4278L218.577 24.7444C219.502 26.0667 220.604 27.1056 221.881 27.8611C223.157 28.5852 224.785 28.9472 226.764 28.9472C228.616 28.9472 230.084 28.5694 231.17 27.8139C232.287 27.0583 232.845 26.0194 232.845 24.6972C232.845 23.5954 232.558 22.6981 231.984 22.0056C231.409 21.313 230.643 20.7463 229.685 20.3056C228.76 19.8333 227.722 19.4241 226.573 19.0778C225.456 18.7 224.323 18.2907 223.173 17.85C222.056 17.3778 221.019 16.7954 220.061 16.1028C219.135 15.4102 218.385 14.513 217.811 13.4111C217.236 12.3093 216.949 10.9083 216.949 9.20833C216.949 7.25648 217.428 5.6037 218.385 4.25C219.375 2.86482 220.7 1.81019 222.359 1.08611C224.019 0.362037 225.871 0 227.914 0C230.116 0 232.079 0.425 233.803 1.275C235.559 2.125 236.979 3.21111 238.064 4.53333L234.33 8.21667C233.372 7.1463 232.367 6.35926 231.313 5.85556C230.292 5.32037 229.111 5.05278 227.77 5.05278C226.11 5.05278 224.801 5.38333 223.844 6.04445C222.918 6.70556 222.455 7.63426 222.455 8.83056C222.455 9.83796 222.742 10.6565 223.317 11.2861C223.892 11.8843 224.642 12.4037 225.567 12.8444C226.525 13.2537 227.562 13.6472 228.68 14.025C229.829 14.4028 230.962 14.8278 232.079 15.3C233.228 15.7722 234.266 16.3861 235.192 17.1417C236.149 17.8657 236.915 18.8102 237.49 19.975C238.064 21.1398 238.352 22.6037 238.352 24.3667C238.352 27.3259 237.282 29.6713 235.144 31.4028C233.037 33.1343 230.18 34 226.573 34Z" fill="var(--fill-0, black)"/>
+<path fill-rule="evenodd" clip-rule="evenodd" d="M253.562 20.7778C251.551 20.7778 249.747 20.3213 248.151 19.4083C246.587 18.4639 245.358 17.2046 244.464 15.6306C243.571 14.0565 243.124 12.2935 243.124 10.3417C243.124 8.38982 243.555 6.64259 244.417 5.1C245.31 3.52593 246.539 2.28241 248.103 1.36944C249.668 0.456481 251.471 0 253.514 0C255.557 0 257.36 0.456481 258.925 1.36944C260.521 2.28241 261.766 3.52593 262.659 5.1C263.553 6.64259 264 8.38982 264 10.3417C264 12.2935 263.553 14.0722 262.659 15.6778C261.766 17.2519 260.537 18.4954 258.972 19.4083C257.408 20.3213 255.605 20.7778 253.562 20.7778ZM253.514 19.2667C255.27 19.2667 256.802 18.8731 258.111 18.0861C259.451 17.2991 260.505 16.2287 261.271 14.875C262.037 13.5213 262.42 12.0102 262.42 10.3417C262.42 8.67315 262.037 7.17778 261.271 5.85556C260.505 4.53333 259.451 3.4787 258.111 2.69167C256.802 1.90463 255.27 1.51111 253.514 1.51111C251.79 1.51111 250.258 1.90463 248.917 2.69167C247.609 3.4787 246.571 4.53333 245.805 5.85556C245.071 7.17778 244.704 8.67315 244.704 10.3417C244.704 12.0102 245.071 13.5213 245.805 14.875C246.571 16.2287 247.609 17.2991 248.917 18.0861C250.258 18.8731 251.79 19.2667 253.514 19.2667Z" fill="var(--fill-0, black)"/>
+<path d="M35.5189 0.472222L49.0693 33.5278H52.8998L66.546 0.472222H60.6566L51.0372 24.5938L41.5041 0.472222H35.5189Z" fill="var(--fill-0, black)"/>
+<path d="M71.3479 0.472222V33.5278H93.9V28.5694H76.8543V19.0306H92.272V14.2611H76.8543V5.43056H93.6606V0.472222H71.3479Z" fill="var(--fill-0, black)"/>
+<path d="M105.097 19.5028H106.516L117.977 33.5278H124.92L113.159 19.4705C114.847 19.3619 116.357 18.9791 117.689 18.3222C119.286 17.5352 120.514 16.4333 121.376 15.0167C122.27 13.6 122.717 11.9315 122.717 10.0111C122.717 8.18518 122.27 6.56389 121.376 5.14722C120.514 3.69908 119.286 2.56574 117.689 1.74722C116.093 0.897222 114.242 0.472222 112.135 0.472222H99.5904V33.5278H105.097V19.5028ZM105.097 15.0167V5.19444H111.896C113.588 5.19444 114.896 5.66667 115.822 6.61111C116.748 7.55556 117.211 8.72037 117.211 10.1056C117.211 11.6481 116.732 12.8602 115.774 13.7417C114.849 14.5917 113.54 15.0167 111.848 15.0167H105.097Z" fill="var(--fill-0, black)"/>
+<path d="M129.002 33.5278V0.472222H134.508V28.5694H150.309V33.5278H129.002Z" fill="var(--fill-0, black)"/>
+<path fill-rule="evenodd" clip-rule="evenodd" d="M155.327 0.472222V33.5278H177.879V28.5694H160.833V19.0306H176.251V14.2611H160.833V5.43056H177.64V0.472222H155.327Z" fill="var(--fill-0, black)"/>
+<path fill-rule="evenodd" clip-rule="evenodd" d="M205.116 23.282L187.4 0.472222H183.57V33.5278H189.076V10.718L206.792 33.5278H210.623V0.472222H205.116V23.282Z" fill="var(--fill-0, black)"/>
+<path d="M251.886 11.05H252.336L256.1 15.6778H258.398L254.488 11.0413C255.372 10.9899 256.1 10.7094 256.674 10.2C257.345 9.63333 257.68 8.86204 257.68 7.88611C257.68 6.97315 257.345 6.23333 256.674 5.66667C256.036 5.06852 255.206 4.76944 254.184 4.76944H250.067V15.6778H251.886V11.05ZM251.886 9.53889V6.32778H254.089C254.631 6.32778 255.062 6.48518 255.381 6.8C255.701 7.11481 255.86 7.49259 255.86 7.93333C255.86 8.43704 255.701 8.83056 255.381 9.11389C255.062 9.39722 254.631 9.53889 254.089 9.53889H251.886Z" fill="var(--fill-0, black)"/>
+</g>
+</svg>
+        </a>
+        <div class="footer__links">
+          <a href="https://instagram.com/0verlens" class="footer__link" target="_blank" rel="noopener">Instagram</a>
+          <a href="https://higgsfield.ai" class="footer__link" target="_blank" rel="noopener">Higgsfield</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Nav scroll effect
+    const nav = document.getElementById('mainNav');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 50) {
+        nav.classList.add('scrolled');
+      } else {
+        nav.classList.remove('scrolled');
+      }
+    });
+
+    // Mobile menu
+    const navToggle = document.getElementById('navToggle');
+    const navMobile = document.getElementById('navMobile');
+    const navClose = document.getElementById('navClose');
+    const navMobileLinks = document.querySelectorAll('.nav-mobile__link');
+
+    navToggle.addEventListener('click', () => {
+      navMobile.classList.add('open');
+    });
+
+    navClose.addEventListener('click', () => {
+      navMobile.classList.remove('open');
+    });
+
+    navMobileLinks.forEach(link => {
+      link.addEventListener('click', () => {
+        navMobile.classList.remove('open');
+      });
+    });
+
+    // Toggle tutorial cards
+    function toggleTut(header) {
+      const card = header.closest('.tut-card');
+      card.classList.toggle('is-open');
+      header.setAttribute('aria-expanded', card.classList.contains('is-open') ? 'true' : 'false');
+    }
+
+    // Teclado para tutorial cards
+    document.querySelectorAll('.tut-card__header').forEach(header => {
+      header.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          toggleTut(header);
+        }
+      });
+    });
+
+    // Toggle prompt cards
+    function togglePrompt(header) {
+      const card = header.closest('.prompt-card');
+      card.classList.toggle('is-open');
+      header.setAttribute('aria-expanded', card.classList.contains('is-open') ? 'true' : 'false');
+    }
+
+    // Acessibilidade: role, tabindex, aria-expanded e teclado nos headers
+    document.querySelectorAll('.prompt-card__header').forEach(header => {
+      header.setAttribute('role', 'button');
+      header.setAttribute('tabindex', '0');
+      header.setAttribute('aria-expanded', 'false');
+      header.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          togglePrompt(header);
+        }
+      });
+    });
+
+    // Acessibilidade: aria-label nos botões de copiar
+    document.querySelectorAll('.prompt-code').forEach(block => {
+      const label = block.querySelector('.prompt-code__label')?.textContent?.trim() || 'prompt';
+      const btn = block.querySelector('.prompt-code__copy');
+      if (btn) btn.setAttribute('aria-label', `Copiar ${label}`);
+    });
+
+    // Copy prompt to clipboard
+    function copyPrompt(button) {
+      const codeBlock = button.parentElement.querySelector('.prompt-code__text');
+      const text = codeBlock.textContent;
+
+      navigator.clipboard.writeText(text).then(() => {
+        const originalText = button.textContent;
+        button.textContent = 'Copiado!';
+        button.style.color = 'var(--brand-cloro)';
+        button.setAttribute('aria-label', 'Copiado com sucesso');
+        setTimeout(() => {
+          button.textContent = originalText;
+          button.style.color = '';
+          const block = button.closest('.prompt-code');
+          const lbl = block?.querySelector('.prompt-code__label')?.textContent?.trim() || 'prompt';
+          button.setAttribute('aria-label', `Copiar ${lbl}`);
+        }, 2000);
+      });
+    }
+
+    // Smooth scroll com offset para nav fixa
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    });
+
+    // Active section tracking para nav mobile
+    const sections = document.querySelectorAll('section[id]');
+    const mobileLinks = document.querySelectorAll('.nav-mobile__link[href^="#"]');
+    const sectionObserver = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const id = entry.target.id;
+          mobileLinks.forEach(link => {
+            link.classList.toggle('active', link.getAttribute('href') === `#${id}`);
+          });
+        }
+      });
+    }, { rootMargin: '-15% 0px -65% 0px' });
+    sections.forEach(sec => sectionObserver.observe(sec));
+  </script>
+
+</body>
+</html>
